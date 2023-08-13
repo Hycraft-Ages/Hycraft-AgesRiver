@@ -32,7 +32,7 @@ public abstract class Hologram {
 
 	protected abstract void sendPackets(Player player, Object nmsArmorStands);
 
-	public static void sendTo(final Player player, Location location, final String... lines) {
+	protected static void sendTo(final Player player, Location location, final String... lines) {
 		Hologram holo;
 
 		if (MinecraftVersion.equals(MinecraftVersion.V.v1_19)) {

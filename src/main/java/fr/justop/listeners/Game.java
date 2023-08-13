@@ -1,16 +1,15 @@
 package fr.justop.listeners;
 
-import java.util.Arrays;
-import java.util.Map.Entry;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import fr.justop.AgesRiver;
+import fr.justop.enums.StateGame;
+import fr.justop.enums.StateManager;
+import fr.justop.guis.InventoryPlayers;
+import fr.justop.holograms.HologramManager;
+import fr.justop.players.ListPlayers;
+import fr.justop.players.PlayerStats;
+import fr.justop.tasks.TaskCommencement;
+import fr.justop.tasks.TaskGame;
+import org.bukkit.*;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -31,16 +30,11 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.justop.AgesRiver;
-import fr.justop.enums.StateGame;
-import fr.justop.enums.StateManager;
-import fr.justop.guis.InventoryPlayers;
-import fr.justop.players.ListPlayers;
-import fr.justop.players.PlayerStats;
-import fr.justop.tasks.TaskCommencement;
+import java.util.Arrays;
+import java.util.Map.Entry;
+import java.util.UUID;
 
-public class Game implements Listener
-{
+public class Game implements Listener {
 	private AgesRiver instance;
 	private TaskCommencement task;
 	private PlayerStats playerStats;
@@ -105,19 +99,16 @@ public class Game implements Listener
 	private Location locationBlock49;
 	private Location locationBlock50;
 
-	public Game(AgesRiver main)
-	{
+	public Game(AgesRiver main) {
 		this.instance = main;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onJoin(PlayerJoinEvent event)
-	{
+	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		StateManager game = this.instance.getState();
 
-		if(player.hasPermission("hycraft.staff"))
-		{
+		if (player.hasPermission("hycraft.staff")) {
 			player.teleport(new Location(Bukkit.getWorld("Ages_River"), 0.0, 0.0, 0.0, 90.0F, 0.0F));
 			player.setGameMode(GameMode.CREATIVE);
 			player.sendMessage("");
@@ -129,10 +120,8 @@ public class Game implements Listener
 					" (joueur) (nombre)");
 			player.sendMessage("");
 
-			for(Player p : Bukkit.getOnlinePlayers())
-			{
-				if(p.isOp())
-				{
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				if (p.isOp()) {
 					p.sendMessage(AgesRiver.PREFIX + "§4" + player.getName() + "§e vient de se connecter");
 				}
 			}
@@ -150,8 +139,9 @@ public class Game implements Listener
 		player.setFoodLevel(Integer.MAX_VALUE);
 		player.getInventory().clear();
 
-		if (!(game.getStatistique() == StateGame.ATTENTE))
-		{
+		HologramManager.loadClassementHologram(player);
+
+		if (!(game.getStatistique() == StateGame.ATTENTE)) {
 			player.setGameMode(GameMode.SPECTATOR);
 			player.sendMessage(AgesRiver.PREFIX + "§7Le jeu a déja commencé, veuillez patienter la prochaine partie");
 			return;
@@ -172,14 +162,11 @@ public class Game implements Listener
 
 		ListPlayers playersList = this.instance.getList();
 
-		if (game.getStatistique() == StateGame.ATTENTE && playersList.getPlayers().size() <= this.instance.getSpawnManager().getSpawnsList().size())
-		{
-			if (!playersList.getPlayers().contains(player))
-			{
+		if (game.getStatistique() == StateGame.ATTENTE && playersList.getPlayers().size() <= this.instance.getSpawnManager().getSpawnsList().size()) {
+			if (!playersList.getPlayers().contains(player)) {
 				playersList.getPlayers().add(player);
 
-				for(Player p : Bukkit.getOnlinePlayers())
-				{
+				for (Player p : Bukkit.getOnlinePlayers()) {
 					this.instance.getAttenteScoreboard().addToScoreBoard(p);
 				}
 			}
@@ -187,31 +174,26 @@ public class Game implements Listener
 			Bukkit.broadcastMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§c a rejoint la partie ! §4<" + playersList.getPlayers().size() + "/" + this.instance.getSpawnManager().getSpawnsList().size() + ">");
 		}
 
-		if(playersList.getPlayers().size() == this.instance.getSpawnManager().getSpawnsList().size())
-		{
+		if (playersList.getPlayers().size() == this.instance.getSpawnManager().getSpawnsList().size()) {
 			startGame();
 		}
 
 	}
 
 	@EventHandler
-	public void onDamage(EntityDamageEvent event)
-	{
+	public void onDamage(EntityDamageEvent event) {
 		if (!(event.getEntity() instanceof Player)) return;
 		event.setCancelled(true);
 	}
 
 
 	@EventHandler
-	public void onQuit(PlayerQuitEvent event)
-	{
+	public void onQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		ListPlayers playersList = this.instance.getList();
 
-		if(player.isOp())
-		{
-			if(playersList.getPlayers().contains(player))
-			{
+		if (player.isOp()) {
+			if (playersList.getPlayers().contains(player)) {
 				playersList.getPlayers().remove(player);
 			}
 
@@ -221,56 +203,45 @@ public class Game implements Listener
 
 		playersList.getPlayers().remove(player);
 
-		if(this.instance.getState().getStatistique() == StateGame.ATTENTE)
-		{
-			for(Player p : Bukkit.getOnlinePlayers())
-			{
+		if (this.instance.getState().getStatistique() == StateGame.ATTENTE) {
+			for (Player p : Bukkit.getOnlinePlayers()) {
 				this.instance.getAttenteScoreboard().addToScoreBoard(p);
 			}
 
 			event.setQuitMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§c a quitté la partie ! §4<" + playersList.getPlayers().size() + "/" + this.instance.getSpawnManager().getSpawnsList().size() + ">");
 		}
 
-		if(this.instance.getState().getStatistique() == StateGame.COMMENCEMENT)
-		{
-			if(playersList.getPlayers().size() == 1)
-			{
+		if (this.instance.getState().getStatistique() == StateGame.COMMENCEMENT) {
+			if (playersList.getPlayers().size() == 1) {
 				this.task.clear();
-			}
-			else
-			{
+			} else {
 				event.setQuitMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§c a quitté la partie ! §4<" + playersList.getPlayers().size() + "/" + this.instance.getSpawnManager().getSpawnsList().size() + ">");
 			}
 
 		}
-		if(this.instance.getState().getStatistique() == StateGame.JEU)
-		{
+		if (this.instance.getState().getStatistique() == StateGame.JEU) {
 			player.getVehicle().remove();
 			event.setQuitMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§c a quitté la partie !");
 		}
 	}
+
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void onExitBoat(VehicleExitEvent event)
-	{
-		if(event.getVehicle().getPassenger().isOp() && AgesRiver.getInstance().getState().getStatistique() != StateGame.JEU)
-		{
+	public void onExitBoat(VehicleExitEvent event) {
+		if (event.getVehicle().getPassenger().isOp() && AgesRiver.getInstance().getState().getStatistique() != StateGame.JEU) {
 			return;
 		}
 
-		if(event.getVehicle() instanceof Boat && AgesRiver.getInstance().getState().getStatistique() == StateGame.JEU && AgesRiver.getInstance().getList().getPlayers().contains(event.getVehicle().getPassenger()))
-		{
+		if (event.getVehicle() instanceof Boat && AgesRiver.getInstance().getState().getStatistique() == StateGame.JEU && AgesRiver.getInstance().getList().getPlayers().contains(event.getVehicle().getPassenger())) {
 			event.setCancelled(true);
 		}
 	}
 
-	public void startGame()
-	{
+	public void startGame() {
 		ListPlayers playersList = AgesRiver.getInstance().getList();
 		StateManager game = AgesRiver.getInstance().getState();
 
-		if (game.getStatistique() == StateGame.ATTENTE && playersList.getPlayers().size() >= 2)
-		{
+		if (game.getStatistique() == StateGame.ATTENTE && playersList.getPlayers().size() >= 2) {
 			this.task = new TaskCommencement();
 			game.setStatistique(StateGame.COMMENCEMENT);
 			this.InitializePositions();
@@ -282,13 +253,11 @@ public class Game implements Listener
 		}
 	}
 
-	public TaskCommencement getTask()
-	{
+	public TaskCommencement getTask() {
 		return this.task;
 	}
 
-	public void InitializePositions()
-	{
+	public void InitializePositions() {
 		this.locationBlock1 = new Location(Bukkit.getWorld("Ages_River"), -349.0, 52.0, -209.0, 0.0f, 0.0f);
 		this.locationBlock2 = new Location(Bukkit.getWorld("Ages_River"), -348.0, 52.0, -209.0, 0.0f, 0.0f);
 		this.locationBlock3 = new Location(Bukkit.getWorld("Ages_River"), -348.0, 52.0, -208.0, 0.0f, 0.0f);
@@ -345,23 +314,19 @@ public class Game implements Listener
 
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void onMoveBoat(VehicleMoveEvent event)
-	{
+	public void onMoveBoat(VehicleMoveEvent event) {
 
-		if(event.getVehicle() instanceof Boat)
-		{
+		if (event.getVehicle() instanceof Boat) {
 			Boat boat = (Boat) event.getVehicle();
 
-			if(boat.isEmpty())
-			{
+			if (boat.isEmpty()) {
 				Bukkit.getConsoleSender().sendMessage("Null");
 				return;
 			}
 
 			final Player player = (Player) boat.getPassenger();
 
-			if(player == null)
-			{
+			if (player == null) {
 				Bukkit.getConsoleSender().sendMessage("Null Player");
 			}
 
@@ -369,7 +334,7 @@ public class Game implements Listener
 
 			Location locationTo = event.getTo().getBlock().getLocation();
 
-			if(locationTo.equals(locationBlock1) ||
+			if (locationTo.equals(locationBlock1) ||
 					locationTo.equals(locationBlock2) ||
 					locationTo.equals(locationBlock3) ||
 					locationTo.equals(locationBlock4) ||
@@ -382,8 +347,7 @@ public class Game implements Listener
 					locationTo.equals(locationBlock11) ||
 					locationTo.equals(locationBlock12) ||
 					locationTo.equals(locationBlock13) ||
-					locationTo.equals(locationBlock14))
-			{
+					locationTo.equals(locationBlock14)) {
 				Bukkit.getConsoleSender().sendMessage("§aOK");
 
 				AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -888.0, 55.0, -9515.0, 180.0f, 0.0f));
@@ -395,8 +359,7 @@ public class Game implements Listener
 				AgesRiver.getInstance().getBossBars().addPlayer(player, 2);
 				int current = this.playerStats.getNbTour().get(player.getUniqueId());
 
-				switch(current)
-				{
+				switch (current) {
 					case 1:
 						this.playerStats.getSeg1().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer());
 						this.instance.getStats().getCurrentAge().put(player.getUniqueId(), 2);
@@ -426,7 +389,7 @@ public class Game implements Listener
 				return;
 			}
 
-			if(locationTo.equals(locationBlock15) ||
+			if (locationTo.equals(locationBlock15) ||
 					locationTo.equals(locationBlock16) ||
 					locationTo.equals(locationBlock17) ||
 					locationTo.equals(locationBlock18) ||
@@ -437,8 +400,7 @@ public class Game implements Listener
 					locationTo.equals(locationBlock23) ||
 					locationTo.equals(locationBlock24) ||
 					locationTo.equals(locationBlock25) ||
-					locationTo.equals(locationBlock26))
-			{
+					locationTo.equals(locationBlock26)) {
 				AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -8940.0, 82.0, -19893.0, 60.0f, 0.0f));
 				player.sendMessage(AgesRiver.PREFIX + "§aVous entrez au Moyen-Age!");
 				boat.remove();
@@ -448,8 +410,7 @@ public class Game implements Listener
 				AgesRiver.getInstance().getBossBars().addPlayer(player, 3);
 				int current = this.playerStats.getNbTour().get(player.getUniqueId());
 
-				switch(current)
-				{
+				switch (current) {
 					case 1:
 						this.playerStats.getSeg2().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer()
 								- this.playerStats.getSeg1().get(player.getUniqueId()));
@@ -480,7 +441,7 @@ public class Game implements Listener
 				return;
 			}
 
-			if(locationTo.equals(locationBlock27) ||
+			if (locationTo.equals(locationBlock27) ||
 					locationTo.equals(locationBlock28) ||
 					locationTo.equals(locationBlock29) ||
 					locationTo.equals(locationBlock30) ||
@@ -503,15 +464,13 @@ public class Game implements Listener
 					locationTo.equals(locationBlock47) ||
 					locationTo.equals(locationBlock48) ||
 					locationTo.equals(locationBlock49) ||
-					locationTo.equals(locationBlock50))
-			{
+					locationTo.equals(locationBlock50)) {
 				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
 				boat.remove();
 
 				int current = this.playerStats.getNbTour().get(player.getUniqueId());
 
-				switch(current)
-				{
+				switch (current) {
 					case 1:
 
 						AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -196.0, 36.0, -67.0, 90.0f, 0.0f));
@@ -563,15 +522,14 @@ public class Game implements Listener
 						AgesRiver.getInstance().getBossBars().removePlayer(player);
 						AgesRiver.getInstance().getStats().getCurrentAge().remove(player.getUniqueId());
 
-						for(Player p : AgesRiver.getInstance().getList().getPlayers())
-						{
+						for (Player p : AgesRiver.getInstance().getList().getPlayers()) {
 							AgesRiver.getInstance().getGameScoreboard().addToScoreBoard(p);
 
 						}
 
 						player.teleport(new Location(Bukkit.getWorld("Ages_River"), -9051.0, 101.0, -19941.0, 90.0f, 0.0f));
 
-						AgesRiver.getInstance().getStats().getFinalTime().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().toString());
+						AgesRiver.getInstance().getStats().getFinalTime().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer());
 						Bukkit.broadcastMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§6 a complété la course en position §en°" + size + "§6. §e[" + AgesRiver.getInstance().getTaskGame().toString() + "]");
 						player.setAllowFlight(true);
 						player.setInvisible(true);
@@ -594,15 +552,14 @@ public class Game implements Listener
 		}
 	}
 
-	private void giveCompass(Player player)
-	{
+	private void giveCompass(Player player) {
 		player.getInventory().clear();
 
 		ItemStack compass = new ItemStack(Material.COMPASS, 1);
 		ItemMeta meta = compass.getItemMeta();
 
 		meta.setDisplayName("§b§lBoussole de TP");
-		meta.setLore(Arrays.asList("", "§eClic droit sur la boussole", "§epour ouvrir le menu de", "§etéléportation." ));
+		meta.setLore(Arrays.asList("", "§eClic droit sur la boussole", "§epour ouvrir le menu de", "§etéléportation."));
 		compass.setItemMeta(meta);
 
 		player.getInventory().setItem(4, compass);
@@ -611,32 +568,25 @@ public class Game implements Listener
 	}
 
 	@EventHandler
-	public void onCollision(VehicleEntityCollisionEvent event)
-	{
-		if(event.getEntity() instanceof Boat && event.getVehicle() instanceof Boat)
-		{
+	public void onCollision(VehicleEntityCollisionEvent event) {
+		if (event.getEntity() instanceof Boat && event.getVehicle() instanceof Boat) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler
-	public void onDrop(PlayerDropItemEvent event)
-	{
-		if(event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lBoussole de TP"))
-		{
+	public void onDrop(PlayerDropItemEvent event) {
+		if (event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lBoussole de TP")) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler
-	public void onInteract(PlayerInteractEvent event)
-	{
-		if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-		{
-			if(event.getItem() == null) return;
+	public void onInteract(PlayerInteractEvent event) {
+		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			if (event.getItem() == null) return;
 
-			if(event.getItem().getItemMeta().getDisplayName().equals("§b§lBoussole de TP"))
-			{
+			if (event.getItem().getItemMeta().getDisplayName().equals("§b§lBoussole de TP")) {
 				InventoryPlayers invPlayers = new InventoryPlayers();
 
 				invPlayers.buildHeads();
@@ -645,63 +595,35 @@ public class Game implements Listener
 		}
 	}
 
-	private void checkEnd()
-	{
-		if(AgesRiver.getInstance().getFinished().size() == AgesRiver.getInstance().getList().getPlayers().size())
-		{
+	private void checkEnd() {
+		if (AgesRiver.getInstance().getFinished().size() == AgesRiver.getInstance().getList().getPlayers().size()) {
 			AgesRiver.getInstance().getTaskGame().cancel();
 			AgesRiver.getInstance().getState().setStatistique(StateGame.FIN);
 
-			for(Entry<UUID, Integer> entry : AgesRiver.getInstance().getFinished().entrySet())
-			{
-				if(entry.getValue() == 1)
-				{
+			for (Entry<UUID, Integer> entry : AgesRiver.getInstance().getFinished().entrySet()) {
+				if (entry.getValue() == 1) {
 					this.player1 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 2)
-				{
+				} else if (entry.getValue() == 2) {
 					this.player2 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 3)
-				{
+				} else if (entry.getValue() == 3) {
 					this.player3 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 4)
-				{
+				} else if (entry.getValue() == 4) {
 					this.player4 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 5)
-				{
+				} else if (entry.getValue() == 5) {
 					this.player5 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 6)
-				{
+				} else if (entry.getValue() == 6) {
 					this.player6 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 7)
-				{
+				} else if (entry.getValue() == 7) {
 					this.player7 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 8)
-				{
+				} else if (entry.getValue() == 8) {
 					this.player8 = Bukkit.getPlayer(entry.getKey());
-				}
-
-				else if(entry.getValue() == 9)
-				{
+				} else if (entry.getValue() == 9) {
 					this.player9 = Bukkit.getPlayer(entry.getKey());
 				}
 			}
 
-			for(Player player : AgesRiver.getInstance().getList().getPlayers())
-			{
+			for (Player player : AgesRiver.getInstance().getList().getPlayers()) {
+				PlayerStats.getGlobal().put(player.getUniqueId(), AgesRiver.getInstance().getStats().getFinalTime().get(player.getUniqueId()));
 				AgesRiver.getInstance().getAttenteScoreboard().addToScoreBoard(player);
 				player.setAllowFlight(false);
 				player.setInvisible(false);
@@ -710,21 +632,24 @@ public class Game implements Listener
 				player.teleport(new Location(Bukkit.getWorld("Ages_River"), -105.0, 33.0, -64.0, 90.0f, 0.0f));
 
 				String p3 = (this.player3 == null) ? "null" : player3.getName();
-				String t3 = (this.player3 == null) ? "?'??" : AgesRiver.getInstance().getStats().getFinalTime().get(player3.getUniqueId()) + "]";
+				String t3 = (this.player3 == null) ? "?'??" : TaskGame.secondsToMinutes(AgesRiver.getInstance().getStats().getFinalTime().get(player3.getUniqueId())) + "]";
 
 				player.sendMessage("");
 				player.sendMessage("§8§m--------------" + AgesRiver.PREFIX + "§r§8§m---------------");
 				player.sendMessage("");
 				player.sendMessage("               §e§lClassement:                   ");
 				player.sendMessage("           ");
-				player.sendMessage("           §6§l1er: §r" + this.player1.getName() + " §b[" + AgesRiver.getInstance().getStats().getFinalTime().get(player1.getUniqueId()) + "]");
-				player.sendMessage("           §7§l2e: §r" + this.player2.getName() + " §b[" + AgesRiver.getInstance().getStats().getFinalTime().get(player2.getUniqueId()) + "]");
+				player.sendMessage("           §6§l1er: §r" + this.player1.getName() + " §b[" + TaskGame.secondsToMinutes(AgesRiver.getInstance().getStats().getFinalTime().get(player1.getUniqueId())) + "]");
+				player.sendMessage("           §7§l2e: §r" + this.player2.getName() + " §b[" + TaskGame.secondsToMinutes(AgesRiver.getInstance().getStats().getFinalTime().get(player2.getUniqueId())) + "]");
 				player.sendMessage("           §c§l3e: §r" + p3 + " §b[" + t3 + "]");
 				player.sendMessage("");
 				player.sendMessage("               §6§lGG à eux!               ");
 				player.sendMessage("§8§m----------------------------------------");
 				player.sendMessage("");
 			}
+
+			PlayerStats.sortByValues();
+
 
 			AgesRiver.getInstance().getProfileManager().addPoint(player1);
 			AgesRiver.getInstance().getProfileManager().addTrophy(player1, "or", 5);
@@ -739,15 +664,12 @@ public class Game implements Listener
 			AgesRiver.getInstance().getProfileManager().addTrophy(player8, "bronze", 3);
 			AgesRiver.getInstance().getProfileManager().addTrophy(player9, "bronze", 1);
 
-			new BukkitRunnable()
-			{
+			new BukkitRunnable() {
 				int timer = 0;
 
 				@Override
-				public void run()
-				{
-					if(timer <= 10)
-					{
+				public void run() {
+					if (timer <= 10) {
 						Location loc = player1.getLocation();
 
 						Firework firework = loc.getWorld().spawn(loc, Firework.class);
@@ -765,10 +687,8 @@ public class Game implements Listener
 						firework.detonate();
 					}
 
-					if(timer == 20)
-					{
-						for(Player player : AgesRiver.getInstance().getList().getPlayers())
-						{
+					if (timer == 20) {
+						for (Player player : AgesRiver.getInstance().getList().getPlayers()) {
 							player.kickPlayer("§bMerci pour votre participation!");
 							AgesRiver.getInstance().getList().getPlayers().clear();
 						}

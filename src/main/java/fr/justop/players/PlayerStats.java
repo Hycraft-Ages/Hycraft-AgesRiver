@@ -1,9 +1,6 @@
 package fr.justop.players;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerStats {
 	private Map<UUID, Integer> nbTour;
@@ -17,8 +14,9 @@ public class PlayerStats {
 	private Map<UUID, Integer> seg8;
 	private Map<UUID, Integer> seg9;
 	private Map<UUID, Integer> currentAge;
-	private Map<UUID, String> finalTime;
-	private static Map<UUID, Integer> global = new TreeMap<>();
+	private Map<UUID, Integer> finalTime;
+	private static Map<UUID, Integer> global = new HashMap<>();
+	private static Map<UUID, Integer> sortedGlobal = new LinkedHashMap<>();
 
 	public void initialize() {
 		this.nbTour = new HashMap<>();
@@ -34,6 +32,32 @@ public class PlayerStats {
 		this.currentAge = new HashMap<>();
 		this.finalTime = new HashMap<>();
 
+	}
+
+	public static void sortByValues() {
+
+		sortedGlobal.clear();
+		List<Integer> list = new ArrayList<>();
+
+		for (Map.Entry<UUID, Integer> entry : global.entrySet()) {
+			list.add(entry.getValue());
+		}
+
+		list.sort(Comparator.naturalOrder());
+
+		for (int value : list) {
+			for (Map.Entry<UUID, Integer> entry : global.entrySet()) {
+				if (entry.getValue().equals(value)) {
+					sortedGlobal.put(entry.getKey(), value);
+				}
+			}
+		}
+
+	}
+
+
+	public static Map<UUID, Integer> getSortedGlobal() {
+		return sortedGlobal;
 	}
 
 	public static Map<UUID, Integer> getGlobal() {
@@ -110,7 +134,7 @@ public class PlayerStats {
 	/**
 	 * @return the finalTime
 	 */
-	public Map<UUID, String> getFinalTime() {
+	public Map<UUID, Integer> getFinalTime() {
 		return finalTime;
 	}
 

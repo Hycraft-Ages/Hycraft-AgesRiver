@@ -11,20 +11,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpawnManager
-{
+public class SpawnManager {
 	private File file;
 	private YamlConfiguration configuration;
 	private AgesRiver instance;
 	private List<Location> spawnsList = new ArrayList<>();
 
-	public SpawnManager(AgesRiver main)
-	{
+	public SpawnManager(AgesRiver main) {
 		this.instance = main;
 	}
 
-	public void onFile()
-	{
+	public void onFile() {
 
 		loadConfig();
 
@@ -32,13 +29,12 @@ public class SpawnManager
 
 		ConfigurationSection spawnsSection = this.configuration.getConfigurationSection("spawns");
 
-		for (String spawn : spawnsSection.getKeys(false))
-		{
-			double locX  = spawnsSection.getDouble(spawn + ".X");
-			double locY  = spawnsSection.getDouble(spawn + ".Y");
-			double locZ  = spawnsSection.getDouble(spawn + ".Z");
-			float yaw 	 = (float) spawnsSection.getDouble(spawn + ".yaw");
-			float pitch  = (float) spawnsSection.getDouble(spawn + ".pitch");
+		for (String spawn : spawnsSection.getKeys(false)) {
+			double locX = spawnsSection.getDouble(spawn + ".X");
+			double locY = spawnsSection.getDouble(spawn + ".Y");
+			double locZ = spawnsSection.getDouble(spawn + ".Z");
+			float yaw = (float) spawnsSection.getDouble(spawn + ".yaw");
+			float pitch = (float) spawnsSection.getDouble(spawn + ".pitch");
 
 			Location loc = new Location(Bukkit.getWorld("Ages_River"), locX, locY, locZ, yaw, pitch);
 			this.spawnsList.add(loc);
@@ -46,46 +42,35 @@ public class SpawnManager
 		}
 	}
 
-	public void loadConfig()
-	{
+	public void loadConfig() {
 
 		if (!this.instance.getDataFolder().exists()) this.instance.getDataFolder().mkdir();
 
 		this.file = new File(this.instance.getDataFolder(), "Spawn.yml");
 
-		if (!file.exists())
-		{
-			try
-			{
+		if (!file.exists()) {
+			try {
 				this.file.createNewFile();
-			}
-			catch (IOException exeption)
-			{
+			} catch (IOException exeption) {
 				exeption.printStackTrace();
 			}
 		}
 		this.configuration = YamlConfiguration.loadConfiguration(file);
 	}
 
-	public void saveArenaConfig()
-	{
-		try
-		{
+	public void saveConfig() {
+		try {
 			this.configuration.save(file);
-		}
-		catch (IOException exeption)
-		{
+		} catch (IOException exeption) {
 			exeption.printStackTrace();
 		}
 	}
 
-	public YamlConfiguration getSpawnConfig()
-	{
+	public YamlConfiguration getSpawnConfig() {
 		return this.configuration;
 	}
 
-	public List<Location> getSpawnsList()
-	{
+	public List<Location> getSpawnsList() {
 		return spawnsList;
 	}
 }

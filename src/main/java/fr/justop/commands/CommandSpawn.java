@@ -1,63 +1,47 @@
 package fr.justop.commands;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import fr.justop.AgesRiver;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Boat;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import fr.justop.AgesRiver;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-public class CommandSpawn implements CommandExecutor, TabCompleter
-{
+public class CommandSpawn implements CommandExecutor, TabCompleter {
 
 	private AgesRiver instance;
 
-	public CommandSpawn(AgesRiver main)
-	{
+	public CommandSpawn(AgesRiver main) {
 		this.instance = main;
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-	{
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
 		YamlConfiguration configuration = this.instance.getSpawnManager().getSpawnConfig();
 
-		if (!(sender instanceof Player))
-		{
+		if (!(sender instanceof Player)) {
 			Bukkit.getServer().getConsoleSender().sendMessage(AgesRiver.PREFIX + "§cSeul un joueur peut effectuer cette commande");
 			return false;
 		}
 
 		Player player = (Player) sender;
 
-		if (command.getName().equalsIgnoreCase("boat-spawn"))
-		{
-			switch (args.length)
-			{
+		if (command.getName().equalsIgnoreCase("boat-spawn")) {
+			switch (args.length) {
 				case 0:
 					player.sendMessage(AgesRiver.PREFIX + "§cUtilisez §b/boat-spawn add");
 					break;
 
 				case 1:
-					if (args[0].equalsIgnoreCase("add"))
-					{
-						if (!player.hasPermission("hycraft.boatrace.staff"))
-						{
+					if (args[0].equalsIgnoreCase("add")) {
+						if (!player.hasPermission("hycraft.boatrace.staff")) {
 							player.sendMessage(AgesRiver.PREFIX + "§cTu n'as pas la permission");
 							return false;
 						}
@@ -74,7 +58,7 @@ public class CommandSpawn implements CommandExecutor, TabCompleter
 
 						player.sendMessage(AgesRiver.PREFIX + "§9Le spawn a été §acréé");
 
-						this.instance.getSpawnManager().saveArenaConfig();
+						this.instance.getSpawnManager().saveConfig();
 
 						return true;
 					}
@@ -87,18 +71,14 @@ public class CommandSpawn implements CommandExecutor, TabCompleter
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args)
-	{
-		String[] VALUES = { "define" };
+	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+		String[] VALUES = {"define"};
 		ArrayList<String> list = new ArrayList<>();
 
-		if (command.getName().equalsIgnoreCase("boat-spawn"))
-		{
-			switch (args.length)
-			{
+		if (command.getName().equalsIgnoreCase("boat-spawn")) {
+			switch (args.length) {
 				case 1:
-					for (String value : VALUES)
-					{
+					for (String value : VALUES) {
 						if (value.toLowerCase().startsWith(args[0].toLowerCase())) list.add(value);
 					}
 					break;

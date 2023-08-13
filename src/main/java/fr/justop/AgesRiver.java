@@ -32,7 +32,7 @@ import java.util.UUID;
  * PluginTemplate is a simple template you can use every time you make
  * a new plugin. This will save you time because you no longer have to
  * recreate the same skeleton and features each time.
- *
+ * <p>
  * It uses Foundation for fast and efficient development process.
  */
 public final class AgesRiver extends SimplePlugin {
@@ -42,42 +42,40 @@ public final class AgesRiver extends SimplePlugin {
 	private StateManager game;
 	private DatabaseManager databaseManager;
 	private ProfileManager manager;
-	private Map<UUID, Profile> profiles = new HashMap<>();
+	private final Map<UUID, Profile> profiles = new HashMap<>();
 	private AttenteScoreboard attenteScoreboard;
 	private GameScoreboard gameScoreboard;
 	private SpawnManager configuration;
 	private ListPlayers list;
 	private PlayerStats stats;
-	private Map<UUID, Integer> finished = new HashMap<>();
+	private final Map<UUID, Integer> finished = new HashMap<>();
 	private BossBars bossBars;
 
 	/**
-	* Automatically perform login ONCE when the plugin starts.
-	*/
+	 * Automatically perform login ONCE when the plugin starts.
+	 */
 	@Override
-	protected void onPluginStart()
-	{
-		this.databaseManager  = new DatabaseManager();
+	protected void onPluginStart() {
+		this.databaseManager = new DatabaseManager();
+
+		try {
+			this.databaseManager.initializeEventProfileDatabase();
+			this.databaseManager.registerGlobal();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
 		this.list = new ListPlayers();
 		this.game = new StateManager();
 		this.game.setStatistique(StateGame.ATTENTE);
 
 		this.bossBars = new BossBars(this);
 
-		this.manager 		  = new ProfileManager(this);
+		this.manager = new ProfileManager(this);
 		this.attenteScoreboard = new AttenteScoreboard(this);
 		this.gameScoreboard = new GameScoreboard(this);
-		this.configuration 	  = new SpawnManager(this);
+		this.configuration = new SpawnManager(this);
 		this.list = new ListPlayers();
-
-		try
-		{
-			this.databaseManager.initializeEventProfileDatabase();
-		}
-		catch (SQLException exeption)
-		{
-			exeption.printStackTrace();
-		}
 
 		onCommands();
 		onListeners();
@@ -88,15 +86,19 @@ public final class AgesRiver extends SimplePlugin {
 	}
 
 	@Override
-	protected void onPluginStop()
-	{
+	protected void onPluginStop() {
+		try {
+			this.databaseManager.saveGlobal();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
 		this.databaseManager.close();
-		this.configuration.saveArenaConfig();
+		this.configuration.saveConfig();
 		Bukkit.getServer().getConsoleSender().sendMessage(PREFIX + "§7Plugin §cdésactivé");
 	}
 
-	private void onCommands()
-	{
+	private void onCommands() {
 		this.getCommand("boat-spawn").setExecutor(new CommandSpawn(this));
 		this.getCommand("boat-staff").setExecutor(new CommandBoatStaff(this, this.game));
 		this.getCommand("boat-warp").setExecutor(new CommandWarps(this));
@@ -104,8 +106,7 @@ public final class AgesRiver extends SimplePlugin {
 		this.getCommand("details").setExecutor(new CommandDetails());
 	}
 
-	private void onListeners()
-	{
+	private void onListeners() {
 		PluginManager pluginManager = getServer().getPluginManager();
 
 		pluginManager.registerEvents(new RegisterPlayer(this), this);
@@ -116,78 +117,64 @@ public final class AgesRiver extends SimplePlugin {
 		pluginManager.registerEvents(new VehicleMove(), this);
 	}
 
-	public void iniStats()
-	{
+	public void iniStats() {
 		this.stats = new PlayerStats();
 	}
 
-	public PlayerStats getStats()
-	{
+	public PlayerStats getStats() {
 		return this.stats;
 	}
 
-	public fr.justop.database.DatabaseManager getDatabaseManager()
-	{
+	public fr.justop.database.DatabaseManager getDatabaseManager() {
 		return this.databaseManager;
 	}
 
-	public ProfileManager getProfileManager()
-	{
+	public ProfileManager getProfileManager() {
 		return this.manager;
 	}
 
-	public Map<UUID, Profile> getProfile()
-	{
+	public Map<UUID, Profile> getProfile() {
 		return this.profiles;
 	}
 
-	public AttenteScoreboard getAttenteScoreboard()
-	{
+	public AttenteScoreboard getAttenteScoreboard() {
 		return this.attenteScoreboard;
 	}
 
-	public SpawnManager getSpawnManager()
-	{
+	public SpawnManager getSpawnManager() {
 		return this.configuration;
 	}
 
-	public ListPlayers getList()
-	{
+	public ListPlayers getList() {
 		return this.list;
 	}
 
-	public StateManager getState()
-	{
+	public StateManager getState() {
 		return this.game;
 	}
 
-	public GameScoreboard getGameScoreboard()
-	{
+	public GameScoreboard getGameScoreboard() {
 		return gameScoreboard;
 	}
 
-	public BossBars getBossBars()
-	{
+	public BossBars getBossBars() {
 		return this.bossBars;
 	}
 
 	/**
 	 * @return the finished
 	 */
-	public Map<UUID, Integer> getFinished()
-	{
+	public Map<UUID, Integer> getFinished() {
 		return finished;
 	}
 
-	public void startTaskGame()
-	{
+	public void startTaskGame() {
 		task = new TaskGame();
 		task.runTaskTimer(getInstance(), 0L, 20L);
 
 	}
 
-	public TaskGame getTaskGame()
-	{
+	public TaskGame getTaskGame() {
 		return this.task;
 	}
 
@@ -198,4 +185,5 @@ public final class AgesRiver extends SimplePlugin {
 	public static AgesRiver getInstance() {
 		return (AgesRiver) SimplePlugin.getInstance();
 	}
+
 }

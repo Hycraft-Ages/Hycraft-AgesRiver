@@ -1,8 +1,11 @@
 package fr.justop.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import fr.justop.AgesRiver;
+import fr.justop.enums.StateGame;
+import fr.justop.enums.StateManager;
+import fr.justop.listeners.Game;
+import fr.justop.players.ListPlayers;
+import fr.justop.players.Profile;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,44 +16,33 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import fr.justop.AgesRiver;
-import fr.justop.enums.StateGame;
-import fr.justop.enums.StateManager;
-import fr.justop.listeners.Game;
-import fr.justop.players.ListPlayers;
-import fr.justop.players.Profile;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CommandBoatStaff implements CommandExecutor, TabCompleter
-{
+public class CommandBoatStaff implements CommandExecutor, TabCompleter {
 
 	private AgesRiver instance;
 	private StateManager game;
 
-	public CommandBoatStaff(AgesRiver main, StateManager game)
-	{
+	public CommandBoatStaff(AgesRiver main, StateManager game) {
 		this.game = game;
 		this.instance = main;
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-	{
-		if (!(sender instanceof Player))
-		{
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (!(sender instanceof Player)) {
 			Bukkit.getServer().getConsoleSender().sendMessage("§cSeul un joueur peur effectuer cette commande");
 			return false;
 		}
 
 		Player player = (Player) sender;
 
-		if (command.getName().equalsIgnoreCase("boat-staff"))
-		{
-			if (player.hasPermission("hycraft.boatrace.staff"))
-			{
+		if (command.getName().equalsIgnoreCase("boat-staff")) {
+			if (player.hasPermission("hycraft.boatrace.staff")) {
 				ListPlayers list = this.instance.getList();
 
-				switch (args.length)
-				{
+				switch (args.length) {
 					case 0:
 
 						player.sendMessage("§8§m-------§r§8[ " + AgesRiver.PREFIX + "§8]§r§8§m------");
@@ -67,14 +59,12 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 						break;
 
 					case 1:
-						if (args[0].equalsIgnoreCase("state"))
-						{
+						if (args[0].equalsIgnoreCase("state")) {
 							player.sendMessage(AgesRiver.PREFIX + "State: " + game.getEtat());
 							return true;
 						}
 
-						if (args[0].equalsIgnoreCase("addSpawn"))
-						{
+						if (args[0].equalsIgnoreCase("addSpawn")) {
 							YamlConfiguration configuration = this.instance.getSpawnManager().getSpawnConfig();
 
 							Location location = player.getLocation();
@@ -86,15 +76,13 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 							configuration.set("spawns.spawn_0" + this.instance.getSpawnManager().getSpawnsList().size() + ".yaw", location.getYaw());
 							configuration.set("spawns.spawn_0" + this.instance.getSpawnManager().getSpawnsList().size() + ".pitch", location.getPitch());
 
-							this.instance.getSpawnManager().saveArenaConfig();
+							this.instance.getSpawnManager().saveConfig();
 
 							player.sendMessage(AgesRiver.PREFIX + "§aVous avez ajouté un spawn de bateau avec succès!");
 						}
 
-						if (args[0].equalsIgnoreCase("force-start"))
-						{
-							if (!(game.getStatistique() == StateGame.ATTENTE) || !(list.getPlayers().size() >= 2))
-							{
+						if (args[0].equalsIgnoreCase("force-start")) {
+							if (!(game.getStatistique() == StateGame.ATTENTE) || !(list.getPlayers().size() >= 2)) {
 								player.sendMessage(AgesRiver.PREFIX + "§cVous devez être au minimum 2 joueurs pour commencer une partie !");
 								return false;
 							}
@@ -103,15 +91,12 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 							return true;
 						}
 
-						if (args[0].equalsIgnoreCase("leave"))
-						{
+						if (args[0].equalsIgnoreCase("leave")) {
 							player.setGameMode(GameMode.CREATIVE);
-							if (list.getPlayers().contains(player))
-							{
+							if (list.getPlayers().contains(player)) {
 								list.getPlayers().remove(player);
 
-								for(Player p : Bukkit.getOnlinePlayers())
-								{
+								for (Player p : Bukkit.getOnlinePlayers()) {
 									this.instance.getAttenteScoreboard().addToScoreBoard(p);
 								}
 							}
@@ -119,10 +104,8 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 							return true;
 						}
 
-						if (args[0].equalsIgnoreCase("join"))
-						{
-							if (!(game.getStatistique() == StateGame.ATTENTE))
-							{
+						if (args[0].equalsIgnoreCase("join")) {
+							if (!(game.getStatistique() == StateGame.ATTENTE)) {
 								player.sendMessage(AgesRiver.PREFIX + "§cLe jeu a déjà commencé, veuillez patienter pour la prochaine partie!");
 								return false;
 							}
@@ -141,12 +124,10 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 							player.sendMessage("§8§m----------------------------------------");
 							player.sendMessage("");
 
-							if (!list.getPlayers().contains(player))
-							{
+							if (!list.getPlayers().contains(player)) {
 								list.getPlayers().add(player);
 
-								for(Player p : Bukkit.getOnlinePlayers())
-								{
+								for (Player p : Bukkit.getOnlinePlayers()) {
 									this.instance.getAttenteScoreboard().addToScoreBoard(p);
 								}
 							}
@@ -160,8 +141,7 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 							return true;
 						}
 
-						if (args[0].equalsIgnoreCase("reload"))
-						{
+						if (args[0].equalsIgnoreCase("reload")) {
 							Bukkit.getPluginManager().disablePlugin(this.instance);
 							Bukkit.getPluginManager().enablePlugin(this.instance);
 							player.sendMessage(AgesRiver.PREFIX + "§aPlugin reload !");
@@ -172,18 +152,16 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 
 					case 2:
 
-						if (args[0].equalsIgnoreCase("profile"))
-						{
-							if (Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(args[1])))
-							{
+						if (args[0].equalsIgnoreCase("profile")) {
+							if (Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(args[1]))) {
 								Player cible = Bukkit.getPlayer(args[1]);
 								Profile profile = instance.getProfile().get(cible.getUniqueId());
 
-								int golds 	= profile.getGold();
+								int golds = profile.getGold();
 								int argents = profile.getArgent();
 								int bronzes = profile.getBronze();
-								int actuel  = profile.getWinActuelle();
-								int record  = profile.getRecordWin();
+								int actuel = profile.getWinActuelle();
+								int record = profile.getRecordWin();
 
 								player.sendMessage("§8--------------" + AgesRiver.PREFIX + "§r§8----------------");
 								player.sendMessage("");
@@ -210,18 +188,14 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args)
-	{
+	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		ArrayList<String> result = new ArrayList<>();
-		String[] VALUES = { "force-start", "leave", "join", "reload", "profile", "state" };
+		String[] VALUES = {"force-start", "leave", "join", "reload", "profile", "state"};
 
-		if (command.getName().equalsIgnoreCase("boat-staff"))
-		{
-			switch (args.length)
-			{
+		if (command.getName().equalsIgnoreCase("boat-staff")) {
+			switch (args.length) {
 				case 1:
-					for (String value : VALUES)
-					{
+					for (String value : VALUES) {
 						if (value.toLowerCase().startsWith(args[0].toLowerCase())) result.add(value);
 					}
 					break;
