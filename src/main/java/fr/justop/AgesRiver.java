@@ -81,8 +81,7 @@ public final class AgesRiver extends SimplePlugin {
 		onListeners();
 		this.configuration.onFile();
 
-		Bukkit.getServer().getConsoleSender().sendMessage(PREFIX + "§7Plugin §aactive");
-		Bukkit.getServer().getConsoleSender().sendMessage(PREFIX + "Etat: §b" + this.game.getEtat());
+		Bukkit.getServer().getConsoleSender().sendMessage(PREFIX + "§aLe plugin est activé");
 	}
 
 	@Override

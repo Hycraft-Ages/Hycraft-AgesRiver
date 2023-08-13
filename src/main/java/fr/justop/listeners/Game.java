@@ -111,6 +111,7 @@ public class Game implements Listener {
 		if (player.hasPermission("hycraft.staff")) {
 			player.teleport(new Location(Bukkit.getWorld("Ages_River"), 0.0, 0.0, 0.0, 90.0F, 0.0F));
 			player.setGameMode(GameMode.CREATIVE);
+			HologramManager.loadClassementHologram(player);
 			player.sendMessage("");
 			player.sendMessage(AgesRiver.PREFIX + "§eBonjour à toi cher membre du staff §b" + player.getDisplayName() + "§e. " +
 					"D'office, tu es exclu de la file d'attente pour pouvoir vaquer à tes occupations. Mais si tu" +

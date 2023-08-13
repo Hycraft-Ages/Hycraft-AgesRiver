@@ -86,7 +86,8 @@ public class HologramManager {
 			index++;
 		}
 
-		Hologram.sendTo(player, new Location(Worlds.getVoidWorld(), 0.0, 0.0, 0.0), strs);
+		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -107.0, 33.5, -59.0), strs);
+		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -137.0, 35.5, -73.0), strs);
 
 
 	}
