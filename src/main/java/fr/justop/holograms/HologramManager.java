@@ -13,7 +13,8 @@ import java.util.UUID;
 
 public class HologramManager {
 	public static void loadClassementHologram(Player player) {
-		String s1 = Common.colorize("&6&l-- Classement Global --");
+
+		String s1 = null;
 		String s2 = null;
 		String s3 = null;
 		String s4 = null;
@@ -22,8 +23,6 @@ public class HologramManager {
 		String s7 = null;
 		String s8 = null;
 		String s9 = null;
-		String s10 = null;
-		String s11 = Common.colorize("&6&lGG à eux");
 
 		int index = 0;
 
@@ -33,39 +32,39 @@ public class HologramManager {
 
 			switch (index) {
 				case 1:
-					s2 = Common.colorize("&e1. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s1 = Common.colorize("&e1. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 2:
-					s3 = Common.colorize("&e2. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s2 = Common.colorize("&e2. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 3:
-					s4 = Common.colorize("&e3. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s3 = Common.colorize("&e3. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 4:
-					s5 = Common.colorize("&e4. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s4 = Common.colorize("&e4. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 5:
-					s6 = Common.colorize("&e5. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s5 = Common.colorize("&e5. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 6:
-					s7 = Common.colorize("&e6. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s6 = Common.colorize("&e6. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 7:
-					s8 = Common.colorize("&e7. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s7 = Common.colorize("&e7. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 8:
-					s9 = Common.colorize("&e8. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s8 = Common.colorize("&e8. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 				case 9:
-					s10 = Common.colorize("&e9. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
+					s9 = Common.colorize("&e9. &a" + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "&7 - &e" + TaskGame.secondsToMinutes(entry.getValue()));
 					break;
 
 
@@ -76,7 +75,7 @@ public class HologramManager {
 			}
 
 		}
-		String[] strs = {s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11};
+		String[] strs = {s1, s2, s3, s4, s5, s6, s7, s8, s9};
 
 		int index2 = 0;
 
@@ -86,8 +85,12 @@ public class HologramManager {
 			index++;
 		}
 
-		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -107.0, 33.5, -59.0), strs);
-		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -137.0, 35.5, -73.0), strs);
+		String[] toDisplay = {Common.colorize("&6&l-- Classement Global --"), s1, s2, s3, s4, s5, s6, s7, s8, s9, Common.colorize("&6&lGG à eux")};
+
+		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -107.5, 34.5, -59.5), strs);
+		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -137.5, 36.5, -73.5), strs);
+
+		player.sendMessage(Bukkit.getOfflinePlayer(UUID.fromString("d55c2202-3509-4f3f-b047-1e4e8799f150 ")).getName());
 
 
 	}
