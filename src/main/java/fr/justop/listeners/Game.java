@@ -9,6 +9,7 @@ import fr.justop.players.ListPlayers;
 import fr.justop.players.PlayerStats;
 import fr.justop.tasks.TaskCommencement;
 import fr.justop.tasks.TaskGame;
+import fr.justop.worlds.Worlds;
 import org.bukkit.*;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Firework;
@@ -624,13 +625,31 @@ public class Game implements Listener {
 			}
 
 			for (Player player : AgesRiver.getInstance().getList().getPlayers()) {
-				PlayerStats.getGlobal().put(player.getUniqueId(), AgesRiver.getInstance().getStats().getFinalTime().get(player.getUniqueId()));
+
+				int finalTime = AgesRiver.getInstance().getStats().getFinalTime().get(player.getUniqueId());
+
+				if (PlayerStats.getGlobal().containsKey(player.getUniqueId()) && PlayerStats.getGlobal().get(player.getUniqueId()) < finalTime) {
+					PlayerStats.getGlobal().put(player.getUniqueId(), AgesRiver.getInstance().getStats().getFinalTime().get(player.getUniqueId()));
+				}
+
 				AgesRiver.getInstance().getAttenteScoreboard().addToScoreBoard(player);
 				player.setAllowFlight(false);
 				player.setInvisible(false);
 				player.getInventory().clear();
 				player.setGameMode(GameMode.ADVENTURE);
 				player.teleport(new Location(Bukkit.getWorld("Ages_River"), -105.0, 33.0, -64.0, 90.0f, 0.0f));
+
+				if (!(player1 == null)) {
+					player1.teleport(new Location(Worlds.getMainWorld(), -127.0, 39.0, -56.0, 180.0f, 0.0f));
+				}
+
+				if (!(player2 == null)) {
+					player2.teleport(new Location(Worlds.getMainWorld(), -124.0, 38.0, -57.0, 180.0f, 0.0f));
+				}
+
+				if (!(player3 == null)) {
+					player3.teleport(new Location(Worlds.getMainWorld(), -130.0, 37.0, -57.0, 180.0f, 0.0f));
+				}
 
 				String p3 = (this.player3 == null) ? "null" : player3.getName();
 				String t3 = (this.player3 == null) ? "?'??" : TaskGame.secondsToMinutes(AgesRiver.getInstance().getStats().getFinalTime().get(player3.getUniqueId())) + "]";

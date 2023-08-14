@@ -33,7 +33,7 @@ public class HologramManager {
 		}
 
 		for (int i = index; i < 9; i++) {
-			strs[i] = Common.colorize("&e9. &a" + "none" + "&7 - &e" + "?");
+			strs[i] = Common.colorize("&e" + (i + 1) + ". &a" + "none" + "&7 - &e" + "?");
 		}
 
 		String[] toDisplay = new String[]{
@@ -42,7 +42,7 @@ public class HologramManager {
 				Common.colorize("&6&lGG à eux")
 		};
 
-		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -107.5, 35.0, -59.5), toDisplay);
-		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -137.5, 37.0, -37.5), toDisplay);
+		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -107.5, 34.0, -59.5), toDisplay);
+		Hologram.sendTo(player, new Location(Worlds.getMainWorld(), -137.5, 36.0, -73.5), toDisplay);
 	}
 }

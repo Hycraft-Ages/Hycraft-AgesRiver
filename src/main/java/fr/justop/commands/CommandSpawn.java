@@ -72,7 +72,7 @@ public class CommandSpawn implements CommandExecutor, TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-		String[] VALUES = {"define"};
+		String[] VALUES = {"add"};
 		ArrayList<String> list = new ArrayList<>();
 
 		if (command.getName().equalsIgnoreCase("boat-spawn")) {
