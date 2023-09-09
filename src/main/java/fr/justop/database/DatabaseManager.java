@@ -20,7 +20,7 @@ public class DatabaseManager {
 	public void initializeEventProfileDatabase() throws SQLException {
 		Statement statement = getEventProfileConnection().getConnection().createStatement();
 		String sql = "CREATE TABLE IF NOT EXISTS event_profile(UUID varchar(36) primary key, actuel int, record int, gold int, argent int, bronze int)";
-		String sql2 = "CREATE TABLE IF NOT EXISTS global_class(place int primary key, UUID varchar(36), temps int)";
+		String sql2 = "CREATE TABLE IF NOT EXISTS global_class(UUID varchar(36) primary key, temps int)";
 		statement.execute(sql);
 		statement.execute(sql2);
 
@@ -30,7 +30,7 @@ public class DatabaseManager {
 	public void saveGlobal() throws SQLException {
 		final Connection connection = getEventProfileConnection().getConnection();
 
-		for (Map.Entry<UUID, Integer> entry : PlayerStats.getSortedGlobal().entrySet()) {
+		for (Map.Entry<UUID, Integer> entry : PlayerStats.getGlobal().entrySet()) {
 
 
 			String uuid = entry.getKey().toString();

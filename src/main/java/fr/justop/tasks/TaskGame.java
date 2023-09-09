@@ -16,9 +16,6 @@ public class TaskGame extends BukkitRunnable {
 	public void run() {
 		for (Player player : this.list.getPlayers()) {
 			this.scoreboard.addToScoreBoard(player);
-			AgesRiver.getInstance().getBossBars().removePlayer(player);
-			AgesRiver.getInstance().getBossBars().createBars();
-			AgesRiver.getInstance().getBossBars().addPlayer(player, AgesRiver.getInstance().getStats().getCurrentAge().get(player.getUniqueId()));
 		}
 
 		timer++;

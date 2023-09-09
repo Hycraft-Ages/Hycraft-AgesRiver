@@ -9,7 +9,6 @@ import fr.justop.guis.InventoryPlayers;
 import fr.justop.listeners.Game;
 import fr.justop.listeners.RegisterPlayer;
 import fr.justop.listeners.SavePlayer;
-import fr.justop.listeners.VehicleMove;
 import fr.justop.players.ListPlayers;
 import fr.justop.players.PlayerStats;
 import fr.justop.players.Profile;
@@ -60,7 +59,6 @@ public final class AgesRiver extends SimplePlugin {
 
 		try {
 			this.databaseManager.initializeEventProfileDatabase();
-			this.databaseManager.registerGlobal();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -68,6 +66,14 @@ public final class AgesRiver extends SimplePlugin {
 		this.list = new ListPlayers();
 		this.game = new StateManager();
 		this.game.setStatistique(StateGame.ATTENTE);
+		iniStats();
+		try {
+			this.databaseManager.registerGlobal();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
+		PlayerStats.sortByValues();
 
 		this.bossBars = new BossBars(this);
 
@@ -113,7 +119,6 @@ public final class AgesRiver extends SimplePlugin {
 		pluginManager.registerEvents(new SavePlayer(this), this);
 		pluginManager.registerEvents(new AttenteScoreboard(this), this);
 		pluginManager.registerEvents(new InventoryPlayers(), this);
-		pluginManager.registerEvents(new VehicleMove(), this);
 	}
 
 	public void iniStats() {

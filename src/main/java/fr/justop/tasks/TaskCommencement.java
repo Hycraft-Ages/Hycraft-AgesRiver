@@ -1,14 +1,16 @@
 package fr.justop.tasks;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import fr.justop.AgesRiver;
 import fr.justop.enums.StateGame;
 import fr.justop.enums.StateManager;
 import fr.justop.players.ListPlayers;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.mineacademy.fo.remain.CompBarColor;
+import org.mineacademy.fo.remain.CompBarStyle;
+import org.mineacademy.fo.remain.Remain;
 
 public class TaskCommencement extends BukkitRunnable
 {
@@ -53,7 +55,7 @@ public class TaskCommencement extends BukkitRunnable
 			for(Player player : AgesRiver.getInstance().getList().getPlayers())
 			{
 				AgesRiver.getInstance().getStats().getNbTour().put(player.getUniqueId(), 1);
-				AgesRiver.getInstance().getBossBars().addPlayer(player, 1);
+				Remain.sendBossbarPercent(player, "§a§lPréhistoire",100, CompBarColor.GREEN, CompBarStyle.SOLID);
 				AgesRiver.getInstance().getGameScoreboard().addToScoreBoard(player);
 				AgesRiver.getInstance().getStats().getCurrentAge().put(player.getUniqueId(), 1);
 			}

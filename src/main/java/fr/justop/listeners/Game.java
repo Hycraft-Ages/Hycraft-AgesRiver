@@ -30,15 +30,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.mineacademy.fo.remain.CompBarColor;
+import org.mineacademy.fo.remain.CompBarStyle;
+import org.mineacademy.fo.remain.Remain;
 
-import java.util.Arrays;
+import java.awt.Color;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 public class Game implements Listener {
 	private AgesRiver instance;
 	private TaskCommencement task;
 	private PlayerStats playerStats;
+	private List<Player> file = new LinkedList<>();
 	private Player player1;
 	private Player player2;
 	private Player player3;
@@ -105,9 +109,9 @@ public class Game implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onJoin(PlayerJoinEvent event) {
+	public void onJoin(PlayerJoinEvent event)
+	{
 		Player player = event.getPlayer();
-		StateManager game = this.instance.getState();
 
 		if (player.hasPermission("hycraft.staff")) {
 			player.teleport(new Location(Bukkit.getWorld("Ages_River"), 0.0, 0.0, 0.0, 90.0F, 0.0F));
@@ -123,7 +127,7 @@ public class Game implements Listener {
 			player.sendMessage("");
 
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				if (p.isOp()) {
+				if (p.hasPermission("hycraft.boatrace.staff")) {
 					p.sendMessage(AgesRiver.PREFIX + "§4" + player.getName() + "§e vient de se connecter");
 				}
 			}
@@ -133,6 +137,13 @@ public class Game implements Listener {
 			return;
 		}
 
+		joinPlayer(player);
+
+	}
+
+	private void joinPlayer(Player player)
+	{
+		StateManager game = this.instance.getState();
 
 		player.teleport(new Location(Bukkit.getWorld("Ages_River"), -105.0D, 33.0D, -64.0D, 90.0F, 0.0F));
 		player.setAllowFlight(false);
@@ -144,10 +155,22 @@ public class Game implements Listener {
 		HologramManager.loadClassementHologram(player);
 
 		if (!(game.getStatistique() == StateGame.ATTENTE)) {
-			player.setGameMode(GameMode.SPECTATOR);
-			player.sendMessage(AgesRiver.PREFIX + "§7Le jeu a déja commencé, veuillez patienter la prochaine partie");
+			player.setGameMode(GameMode.ADVENTURE);
+			player.getAllowFlight();
+			player.setFlying(true);
+			player.teleport(player.getLocation().add(0,1,0));
+			player.sendMessage(AgesRiver.PREFIX + "§cLe jeu a déja commencé, Patiente la prochaine partie! Tu t'est inscrit dans la file d'attente.");
+			player.sendMessage(AgesRiver.PREFIX + "§eUtilise la boussole pour te §btéléporter §eaux autres joueurs!");
+			giveCompass(player);
+
+			if(!file.contains(player))
+			{
+				file.add(player);
+			}
+
 			return;
 		}
+
 		player.sendMessage("");
 		player.sendMessage("§8§m--------------" + AgesRiver.PREFIX + "§r§8§m---------------");
 		player.sendMessage("");
@@ -179,7 +202,6 @@ public class Game implements Listener {
 		if (playersList.getPlayers().size() == this.instance.getSpawnManager().getSpawnsList().size()) {
 			startGame();
 		}
-
 	}
 
 	@EventHandler
@@ -194,7 +216,7 @@ public class Game implements Listener {
 		Player player = event.getPlayer();
 		ListPlayers playersList = this.instance.getList();
 
-		if (player.isOp()) {
+		if (player.hasPermission("hycraft.boatrace.staff")) {
 			if (playersList.getPlayers().contains(player)) {
 				playersList.getPlayers().remove(player);
 			}
@@ -248,7 +270,6 @@ public class Game implements Listener {
 			game.setStatistique(StateGame.COMMENCEMENT);
 			this.InitializePositions();
 			this.playerStats = AgesRiver.getInstance().getStats();
-			AgesRiver.getInstance().iniStats();
 			task.runTaskTimer(AgesRiver.getInstance(), 0L, 20L);
 
 
@@ -350,15 +371,14 @@ public class Game implements Listener {
 					locationTo.equals(locationBlock12) ||
 					locationTo.equals(locationBlock13) ||
 					locationTo.equals(locationBlock14)) {
-				Bukkit.getConsoleSender().sendMessage("§aOK");
 
 				AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -888.0, 55.0, -9515.0, 180.0f, 0.0f));
 				player.sendMessage(AgesRiver.PREFIX + "§aVous entrez en Antiquité!");
 				boat.remove();
 
 				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.0f, 1.0f);
-				AgesRiver.getInstance().getBossBars().removePlayer(player);
-				AgesRiver.getInstance().getBossBars().addPlayer(player, 2);
+				Remain.removeBossbar(player);
+				Remain.sendBossbarPercent(player, "§e§lAntiquité", 100, CompBarColor.YELLOW, CompBarStyle.SOLID);
 				int current = this.playerStats.getNbTour().get(player.getUniqueId());
 
 				switch (current) {
@@ -408,8 +428,8 @@ public class Game implements Listener {
 				boat.remove();
 
 				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.0f, 1.0f);
-				AgesRiver.getInstance().getBossBars().removePlayer(player);
-				AgesRiver.getInstance().getBossBars().addPlayer(player, 3);
+				Remain.removeBossbar(player);
+				Remain.sendBossbarPercent(player, "§b§lMoyen-âge", 100, CompBarColor.BLUE, CompBarStyle.SOLID);
 				int current = this.playerStats.getNbTour().get(player.getUniqueId());
 
 				switch (current) {
@@ -466,7 +486,8 @@ public class Game implements Listener {
 					locationTo.equals(locationBlock47) ||
 					locationTo.equals(locationBlock48) ||
 					locationTo.equals(locationBlock49) ||
-					locationTo.equals(locationBlock50)) {
+					locationTo.equals(locationBlock50))
+			{
 				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
 				boat.remove();
 
@@ -485,9 +506,9 @@ public class Game implements Listener {
 						this.playerStats.getNbTour().put(player.getUniqueId(), 2);
 
 						player.sendTitle("§e2ème tour", null, 10, 20, 10);
-						AgesRiver.getInstance().getBossBars().removePlayer(player);
-						AgesRiver.getInstance().getBossBars().addPlayer(player, 1);
-						player.sendMessage(AgesRiver.PREFIX + "§aVous entamez le tour §e2§a! Tour §e1§a complété en §e" + AgesRiver.getInstance().getTaskGame().secondsToMinutes(AgesRiver.getInstance().getTaskGame().getTimer()));
+						Remain.removeBossbar(player);
+						Remain.sendBossbarPercent(player, "§a§lPréhistoire",100, CompBarColor.GREEN, CompBarStyle.SOLID);
+						player.sendMessage(AgesRiver.PREFIX + "§aVous entamez le tour §e2 §a! Tour §e1§a complété en §e" + AgesRiver.getInstance().getTaskGame().secondsToMinutes(AgesRiver.getInstance().getTaskGame().getTimer()));
 						break;
 
 					case 2:
@@ -510,18 +531,27 @@ public class Game implements Listener {
 								- this.playerStats.getSeg3().get(player.getUniqueId());
 
 						player.sendTitle("§cDernier tour", null, 10, 20, 10);
-						AgesRiver.getInstance().getBossBars().removePlayer(player);
-						AgesRiver.getInstance().getBossBars().addPlayer(player, 1);
-						player.sendMessage(AgesRiver.PREFIX + "§aVous entamez le tour §e3§a! Tour §e2§a complété en §e" + AgesRiver.getInstance().getTaskGame().secondsToMinutes(time));
+						Remain.removeBossbar(player);
+						Remain.sendBossbarPercent(player, "§a§lPréhistoire",100, CompBarColor.GREEN, CompBarStyle.SOLID);
+						player.sendMessage(AgesRiver.PREFIX + "§aVous entamez le tour §e3 §a! Tour §e2§a complété en §e" + AgesRiver.getInstance().getTaskGame().secondsToMinutes(time));
 						break;
 
 					case 3:
 
 						AgesRiver.getInstance().getFinished().put(player.getUniqueId(), AgesRiver.getInstance().getFinished().size() + 1);
 						int size = AgesRiver.getInstance().getFinished().size();
-						this.playerStats.getSeg9().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer());
+						this.playerStats.getSeg9().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer()
+								- this.playerStats.getSeg1().get(player.getUniqueId())
+								- this.playerStats.getSeg2().get(player.getUniqueId())
+								- this.playerStats.getSeg3().get(player.getUniqueId())
+								- this.playerStats.getSeg4().get(player.getUniqueId())
+								- this.playerStats.getSeg5().get(player.getUniqueId())
+								- this.playerStats.getSeg6().get(player.getUniqueId())
+								- this.playerStats.getSeg7().get(player.getUniqueId())
+								- this.playerStats.getSeg8().get(player.getUniqueId())
+								- this.playerStats.getSeg9().get(player.getUniqueId()));
 
-						AgesRiver.getInstance().getBossBars().removePlayer(player);
+						Remain.removeBossbar(player);
 						AgesRiver.getInstance().getStats().getCurrentAge().remove(player.getUniqueId());
 
 						for (Player p : AgesRiver.getInstance().getList().getPlayers()) {
@@ -534,6 +564,7 @@ public class Game implements Listener {
 						AgesRiver.getInstance().getStats().getFinalTime().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer());
 						Bukkit.broadcastMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§6 a complété la course en position §en°" + size + "§6. §e[" + AgesRiver.getInstance().getTaskGame().toString() + "]");
 						player.setAllowFlight(true);
+						player.setFlying(true);
 						player.setInvisible(true);
 
 						giveCompass(player);
@@ -548,8 +579,6 @@ public class Game implements Listener {
 
 						break;
 				}
-
-				return;
 			}
 		}
 	}
@@ -628,7 +657,7 @@ public class Game implements Listener {
 
 				int finalTime = AgesRiver.getInstance().getStats().getFinalTime().get(player.getUniqueId());
 
-				if (PlayerStats.getGlobal().containsKey(player.getUniqueId()) && PlayerStats.getGlobal().get(player.getUniqueId()) < finalTime) {
+				if (!PlayerStats.getGlobal().containsKey(player.getUniqueId()) || PlayerStats.getGlobal().get(player.getUniqueId()) < finalTime) {
 					PlayerStats.getGlobal().put(player.getUniqueId(), AgesRiver.getInstance().getStats().getFinalTime().get(player.getUniqueId()));
 				}
 
@@ -651,8 +680,11 @@ public class Game implements Listener {
 					player3.teleport(new Location(Worlds.getMainWorld(), -130.0, 37.0, -57.0, 180.0f, 0.0f));
 				}
 
+				PlayerStats.sortByValues();
+				HologramManager.loadClassementHologram(player);
+
 				String p3 = (this.player3 == null) ? "null" : player3.getName();
-				String t3 = (this.player3 == null) ? "?'??" : TaskGame.secondsToMinutes(AgesRiver.getInstance().getStats().getFinalTime().get(player3.getUniqueId())) + "]";
+				String t3 = (this.player3 == null) ? "?'??" : TaskGame.secondsToMinutes(AgesRiver.getInstance().getStats().getFinalTime().get(player3.getUniqueId()));
 
 				player.sendMessage("");
 				player.sendMessage("§8§m--------------" + AgesRiver.PREFIX + "§r§8§m---------------");
@@ -668,21 +700,34 @@ public class Game implements Listener {
 				player.sendMessage("");
 			}
 
-			PlayerStats.sortByValues();
-
 
 			AgesRiver.getInstance().getProfileManager().addPoint(player1);
 			AgesRiver.getInstance().getProfileManager().addTrophy(player1, "or", 5);
 			AgesRiver.getInstance().getProfileManager().addTrophy(player2, "or", 3);
-			AgesRiver.getInstance().getProfileManager().addTrophy(player3, "or", 1);
 
-			AgesRiver.getInstance().getProfileManager().addTrophy(player4, "argent", 5);
-			AgesRiver.getInstance().getProfileManager().addTrophy(player5, "argent", 3);
-			AgesRiver.getInstance().getProfileManager().addTrophy(player6, "argent", 1);
+			if(player3 != null) {
+				AgesRiver.getInstance().getProfileManager().addTrophy(player3, "or", 1);
+			}
 
-			AgesRiver.getInstance().getProfileManager().addTrophy(player7, "bronze", 5);
-			AgesRiver.getInstance().getProfileManager().addTrophy(player8, "bronze", 3);
-			AgesRiver.getInstance().getProfileManager().addTrophy(player9, "bronze", 1);
+			if(player4 != null) {
+				AgesRiver.getInstance().getProfileManager().addTrophy(player4, "argent", 5);
+			}
+			if(player5 != null) {
+				AgesRiver.getInstance().getProfileManager().addTrophy(player5, "argent", 3);
+			}
+			if(player6 != null) {
+				AgesRiver.getInstance().getProfileManager().addTrophy(player6, "argent", 1);
+			}
+
+			if(player7 != null) {
+				AgesRiver.getInstance().getProfileManager().addTrophy(player7, "bronze", 5);
+			}
+			if(player8 != null) {
+				AgesRiver.getInstance().getProfileManager().addTrophy(player8, "bronze", 3);
+			}
+			if(player9 != null) {
+				AgesRiver.getInstance().getProfileManager().addTrophy(player9, "bronze", 1);
+			}
 
 			new BukkitRunnable() {
 				int timer = 0;
@@ -696,8 +741,8 @@ public class Game implements Listener {
 						FireworkMeta fireworkMeta = firework.getFireworkMeta();
 
 						FireworkEffect effect = FireworkEffect.builder()
-								.withColor(Color.RED)
-								.withFade(Color.YELLOW)
+								.withColor((Iterable<?>) Color.RED)
+								.withFade((Iterable<?>) Color.YELLOW)
 								.with(FireworkEffect.Type.BALL)
 								.trail(true)
 								.build();
@@ -707,7 +752,7 @@ public class Game implements Listener {
 						firework.detonate();
 					}
 
-					if (timer == 20) {
+					if (timer == 30) {
 						for (Player player : AgesRiver.getInstance().getList().getPlayers()) {
 							player.kickPlayer("§bMerci pour votre participation!");
 							AgesRiver.getInstance().getList().getPlayers().clear();
@@ -738,6 +783,10 @@ public class Game implements Listener {
 
 			}.runTaskTimer(AgesRiver.getInstance(), 20L, 0L);
 
+			for(Player player : file)
+			{
+				this.joinPlayer(player);
+			}
 		}
 
 	}
