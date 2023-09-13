@@ -60,6 +60,13 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter {
 						break;
 
 					case 1:
+
+						if(args[0].equalsIgnoreCase("giveStick"))
+						{
+							Game.giveStick(player);
+							player.sendMessage(AgesRiver.PREFIX + "§aTu a reçu le training stick!");
+						}
+
 						if (args[0].equalsIgnoreCase("state")) {
 							player.sendMessage(AgesRiver.PREFIX + "State: " + game.getEtat());
 							return true;
@@ -233,6 +240,8 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter {
 
 									break;
 							}
+
+
 						}
 
 				}
@@ -248,7 +257,7 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		ArrayList<String> result = new ArrayList<>();
-		String[] VALUES = {"force-start", "leave", "join", "reload", "profile", "state", "switchMode"};
+		String[] VALUES = {"force-start", "leave", "join", "reload", "profile", "state", "switchMode", "giveStick"};
 
 		if (command.getName().equalsIgnoreCase("boat-staff")) {
 			switch (args.length) {

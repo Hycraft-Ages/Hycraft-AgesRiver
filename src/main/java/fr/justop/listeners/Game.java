@@ -590,8 +590,7 @@ public class Game implements Listener {
 								- this.playerStats.getSeg5().get(player.getUniqueId())
 								- this.playerStats.getSeg6().get(player.getUniqueId())
 								- this.playerStats.getSeg7().get(player.getUniqueId())
-								- this.playerStats.getSeg8().get(player.getUniqueId())
-								- this.playerStats.getSeg9().get(player.getUniqueId()));
+								- this.playerStats.getSeg8().get(player.getUniqueId()));
 
 						Remain.removeBossbar(player);
 						AgesRiver.getInstance().getStats().getCurrentAge().remove(player.getUniqueId());
@@ -640,7 +639,7 @@ public class Game implements Listener {
 
 	}
 
-	private static void giveStick(Player player)
+	public static void giveStick(Player player)
 	{
 		player.getInventory().clear();
 

@@ -58,7 +58,7 @@ public class AttenteScoreboard implements Listener
 		teamPlayer.setPrefix("");
 
 		obj.getScore("  ").setScore(15);
-		obj.getScore("Pseudo: §a" + player.getDisplayName()).setScore(14);
+		obj.getScore("Pseudo: §a" + player.getName()).setScore(14);
 		obj.getScore("Connectés: §c<" + game.getPlayers().size() + "/" + this.instance.getSpawnManager().getSpawnsList().size() + ">").setScore(13);
 		obj.getScore("").setScore(12);
 		obj.getScore("§9§l+---------------§r§9§l+§3").setScore(11);
