@@ -1,6 +1,7 @@
 package fr.justop.listeners;
 
 import fr.justop.AgesRiver;
+import fr.justop.enums.Mode;
 import fr.justop.enums.StateGame;
 import fr.justop.enums.StateManager;
 import fr.justop.guis.InventoryPlayers;
@@ -40,9 +41,9 @@ import java.util.Map.Entry;
 
 public class Game implements Listener {
 	private AgesRiver instance;
-	private TaskCommencement task;
-	private PlayerStats playerStats;
-	private List<Player> file = new LinkedList<>();
+	private static TaskCommencement task;
+	private static PlayerStats playerStats;
+	private static List<Player> file = new LinkedList<>();
 	private Player player1;
 	private Player player2;
 	private Player player3;
@@ -53,56 +54,56 @@ public class Game implements Listener {
 	private Player player8;
 	private Player player9;
 
-	private Location locationBlock1;
-	private Location locationBlock2;
-	private Location locationBlock3;
-	private Location locationBlock4;
-	private Location locationBlock5;
-	private Location locationBlock6;
-	private Location locationBlock7;
-	private Location locationBlock8;
-	private Location locationBlock9;
-	private Location locationBlock10;
-	private Location locationBlock11;
-	private Location locationBlock12;
-	private Location locationBlock13;
-	private Location locationBlock14;
-	private Location locationBlock15;
-	private Location locationBlock16;
-	private Location locationBlock17;
-	private Location locationBlock18;
-	private Location locationBlock19;
-	private Location locationBlock20;
-	private Location locationBlock21;
-	private Location locationBlock22;
-	private Location locationBlock23;
-	private Location locationBlock24;
-	private Location locationBlock25;
-	private Location locationBlock26;
-	private Location locationBlock27;
-	private Location locationBlock28;
-	private Location locationBlock29;
-	private Location locationBlock30;
-	private Location locationBlock31;
-	private Location locationBlock32;
-	private Location locationBlock33;
-	private Location locationBlock34;
-	private Location locationBlock35;
-	private Location locationBlock36;
-	private Location locationBlock37;
-	private Location locationBlock38;
-	private Location locationBlock39;
-	private Location locationBlock40;
-	private Location locationBlock41;
-	private Location locationBlock42;
+	private static Location locationBlock1;
+	private static Location locationBlock2;
+	private static Location locationBlock3;
+	private static Location locationBlock4;
+	private static Location locationBlock5;
+	private static Location locationBlock6;
+	private static Location locationBlock7;
+	private static Location locationBlock8;
+	private static Location locationBlock9;
+	private static Location locationBlock10;
+	private static Location locationBlock11;
+	private static Location locationBlock12;
+	private static Location locationBlock13;
+	private static Location locationBlock14;
+	private static Location locationBlock15;
+	private static Location locationBlock16;
+	private static Location locationBlock17;
+	private static Location locationBlock18;
+	private static Location locationBlock19;
+	private static Location locationBlock20;
+	private static Location locationBlock21;
+	private static Location locationBlock22;
+	private static Location locationBlock23;
+	private static Location locationBlock24;
+	private static Location locationBlock25;
+	private static Location locationBlock26;
+	private static Location locationBlock27;
+	private static Location locationBlock28;
+	private static Location locationBlock29;
+	private static Location locationBlock30;
+	private static Location locationBlock31;
+	private static Location locationBlock32;
+	private static Location locationBlock33;
+	private static Location locationBlock34;
+	private static Location locationBlock35;
+	private static Location locationBlock36;
+	private static Location locationBlock37;
+	private static Location locationBlock38;
+	private static Location locationBlock39;
+	private static Location locationBlock40;
+	private static Location locationBlock41;
+	private static Location locationBlock42;
 	private Location locationBlock43;
-	private Location locationBlock44;
-	private Location locationBlock46;
-	private Location locationBlock45;
-	private Location locationBlock47;
-	private Location locationBlock48;
-	private Location locationBlock49;
-	private Location locationBlock50;
+	private static Location locationBlock44;
+	private static Location locationBlock46;
+	private static Location locationBlock45;
+	private static Location locationBlock47;
+	private static Location locationBlock48;
+	private static Location locationBlock49;
+	private static Location locationBlock50;
 
 	public Game(AgesRiver main) {
 		this.instance = main;
@@ -132,18 +133,55 @@ public class Game implements Listener {
 				}
 			}
 
-			this.InitializePositions();
+			InitializePositions();
 			event.setJoinMessage(null);
 			return;
 		}
 
-		joinPlayer(player);
+		if(AgesRiver.getInstance().getState().getMode() == Mode.GAME)
+		{
+			joinPlayer(player);
+		}
+		else
+		{
+			trainPlayer(player);
+		}
+
 
 	}
 
-	private void joinPlayer(Player player)
+	public static void trainPlayer(Player player)
 	{
-		StateManager game = this.instance.getState();
+		player.teleport(new Location(Bukkit.getWorld("Ages_River"), -105.0D, 33.0D, -64.0D, 90.0F, 0.0F));
+		player.setAllowFlight(false);
+		player.setGameMode(GameMode.ADVENTURE);
+		player.setHealth(20D);
+		player.setFoodLevel(Integer.MAX_VALUE);
+		player.getInventory().clear();
+
+		HologramManager.loadClassementHologram(player);
+
+		player.sendMessage("");
+		player.sendMessage("§8§m--------------" + AgesRiver.PREFIX + "§r§8§m---------------");
+		player.sendMessage("");
+		player.sendMessage("    §eBienvenue Joueurs d'Hycraft sur le tout    ");
+		player.sendMessage("       §epremier évenement organisé sur le        ");
+		player.sendMessage("                      §eserveur !                  ");
+		player.sendMessage("    §eTu a rejoint le jeu en mode entraînement. ");
+		player.sendMessage("      §ePour t'entraîner dans les différentes       ");
+		player.sendMessage("                §eépoques, utilise le           ");
+		player.sendMessage("                §a§lTraining stick");
+		player.sendMessage("");
+		player.sendMessage("                 §6§lBonne séance!            ");
+		player.sendMessage("§8§m----------------------------------------");
+		player.sendMessage("");
+
+		giveStick(player);
+	}
+
+	public static void joinPlayer(Player player)
+	{
+		StateManager game = AgesRiver.getInstance().getState();
 
 		player.teleport(new Location(Bukkit.getWorld("Ages_River"), -105.0D, 33.0D, -64.0D, 90.0F, 0.0F));
 		player.setAllowFlight(false);
@@ -185,29 +223,34 @@ public class Game implements Listener {
 		player.sendMessage("§8§m----------------------------------------");
 		player.sendMessage("");
 
-		ListPlayers playersList = this.instance.getList();
+		ListPlayers playersList = AgesRiver.getInstance().getList();
 
-		if (game.getStatistique() == StateGame.ATTENTE && playersList.getPlayers().size() <= this.instance.getSpawnManager().getSpawnsList().size()) {
+		if (game.getStatistique() == StateGame.ATTENTE && playersList.getPlayers().size() <= AgesRiver.getInstance().getSpawnManager().getSpawnsList().size()) {
 			if (!playersList.getPlayers().contains(player)) {
 				playersList.getPlayers().add(player);
 
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					this.instance.getAttenteScoreboard().addToScoreBoard(p);
+					AgesRiver.getInstance().getAttenteScoreboard().addToScoreBoard(p);
 				}
 			}
 
-			Bukkit.broadcastMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§c a rejoint la partie ! §4<" + playersList.getPlayers().size() + "/" + this.instance.getSpawnManager().getSpawnsList().size() + ">");
+			Bukkit.broadcastMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§c a rejoint la partie ! §4<" + playersList.getPlayers().size() + "/" + AgesRiver.getInstance().getSpawnManager().getSpawnsList().size() + ">");
 		}
 
-		if (playersList.getPlayers().size() == this.instance.getSpawnManager().getSpawnsList().size()) {
+		if (playersList.getPlayers().size() == AgesRiver.getInstance().getSpawnManager().getSpawnsList().size()) {
 			startGame();
 		}
 	}
 
 	@EventHandler
 	public void onDamage(EntityDamageEvent event) {
-		if (!(event.getEntity() instanceof Player)) return;
-		event.setCancelled(true);
+		if (event.getEntity() instanceof Player) {
+			event.setCancelled(true);
+		} else if (event.getEntity() instanceof Boat && event.getCause() == EntityDamageEvent.DamageCause.FALL)
+		{
+			event.setCancelled(true);
+		}
+
 	}
 
 
@@ -261,15 +304,15 @@ public class Game implements Listener {
 		}
 	}
 
-	public void startGame() {
+	public static void startGame() {
 		ListPlayers playersList = AgesRiver.getInstance().getList();
 		StateManager game = AgesRiver.getInstance().getState();
 
 		if (game.getStatistique() == StateGame.ATTENTE && playersList.getPlayers().size() >= 2) {
-			this.task = new TaskCommencement();
+			task = new TaskCommencement();
 			game.setStatistique(StateGame.COMMENCEMENT);
-			this.InitializePositions();
-			this.playerStats = AgesRiver.getInstance().getStats();
+			InitializePositions();
+			playerStats = AgesRiver.getInstance().getStats();
 			task.runTaskTimer(AgesRiver.getInstance(), 0L, 20L);
 
 
@@ -280,59 +323,58 @@ public class Game implements Listener {
 		return this.task;
 	}
 
-	public void InitializePositions() {
-		this.locationBlock1 = new Location(Bukkit.getWorld("Ages_River"), -349.0, 52.0, -209.0, 0.0f, 0.0f);
-		this.locationBlock2 = new Location(Bukkit.getWorld("Ages_River"), -348.0, 52.0, -209.0, 0.0f, 0.0f);
-		this.locationBlock3 = new Location(Bukkit.getWorld("Ages_River"), -348.0, 52.0, -208.0, 0.0f, 0.0f);
-		this.locationBlock4 = new Location(Bukkit.getWorld("Ages_River"), -347.0, 52.0, -208.0, 0.0f, 0.0f);
-		this.locationBlock5 = new Location(Bukkit.getWorld("Ages_River"), -347.0, 52.0, -207.0, 0.0f, 0.0f);
-		this.locationBlock6 = new Location(Bukkit.getWorld("Ages_River"), -346.0, 52.0, -207.0, 0.0f, 0.0f);
-		this.locationBlock7 = new Location(Bukkit.getWorld("Ages_River"), -346.0, 52.0, -206.0, 0.0f, 0.0f);
-		this.locationBlock8 = new Location(Bukkit.getWorld("Ages_River"), -345.0, 52.0, -206.0, 0.0f, 0.0f);
-		this.locationBlock9 = new Location(Bukkit.getWorld("Ages_River"), -345.0, 52.0, -205.0, 0.0f, 0.0f);
-		this.locationBlock10 = new Location(Bukkit.getWorld("Ages_River"), -344.0, 52.0, -205.0, 0.0f, 0.0f);
-		this.locationBlock11 = new Location(Bukkit.getWorld("Ages_River"), -344.0, 52.0, -204.0, 0.0f, 0.0f);
-		this.locationBlock12 = new Location(Bukkit.getWorld("Ages_River"), -343.0, 52.0, -204.0, 0.0f, 0.0f);
-		this.locationBlock13 = new Location(Bukkit.getWorld("Ages_River"), -343.0, 52.0, -203.0, 0.0f, 0.0f);
-		this.locationBlock14 = new Location(Bukkit.getWorld("Ages_River"), -342.0, 52.0, -203.0, 0.0f, 0.0f);
+	public static void InitializePositions() {
+		locationBlock1 = new Location(Bukkit.getWorld("Ages_River"), -349.0, 52.0, -209.0, 0.0f, 0.0f);
+		locationBlock2 = new Location(Bukkit.getWorld("Ages_River"), -348.0, 52.0, -209.0, 0.0f, 0.0f);
+		locationBlock3 = new Location(Bukkit.getWorld("Ages_River"), -348.0, 52.0, -208.0, 0.0f, 0.0f);
+		locationBlock4 = new Location(Bukkit.getWorld("Ages_River"), -347.0, 52.0, -208.0, 0.0f, 0.0f);
+		locationBlock5 = new Location(Bukkit.getWorld("Ages_River"), -347.0, 52.0, -207.0, 0.0f, 0.0f);
+		locationBlock6 = new Location(Bukkit.getWorld("Ages_River"), -346.0, 52.0, -207.0, 0.0f, 0.0f);
+		locationBlock7 = new Location(Bukkit.getWorld("Ages_River"), -346.0, 52.0, -206.0, 0.0f, 0.0f);
+		locationBlock8 = new Location(Bukkit.getWorld("Ages_River"), -345.0, 52.0, -206.0, 0.0f, 0.0f);
+		locationBlock9 = new Location(Bukkit.getWorld("Ages_River"), -345.0, 52.0, -205.0, 0.0f, 0.0f);
+		locationBlock10 = new Location(Bukkit.getWorld("Ages_River"), -344.0, 52.0, -205.0, 0.0f, 0.0f);
+		locationBlock11 = new Location(Bukkit.getWorld("Ages_River"), -344.0, 52.0, -204.0, 0.0f, 0.0f);
+		locationBlock12 = new Location(Bukkit.getWorld("Ages_River"), -343.0, 52.0, -204.0, 0.0f, 0.0f);
+		locationBlock13 = new Location(Bukkit.getWorld("Ages_River"), -343.0, 52.0, -203.0, 0.0f, 0.0f);
+		locationBlock14 = new Location(Bukkit.getWorld("Ages_River"), -342.0, 52.0, -203.0, 0.0f, 0.0f);
 
-		this.locationBlock15 = new Location(Bukkit.getWorld("Ages_River"), -902.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock16 = new Location(Bukkit.getWorld("Ages_River"), -903.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock17 = new Location(Bukkit.getWorld("Ages_River"), -904.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock18 = new Location(Bukkit.getWorld("Ages_River"), -905.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock19 = new Location(Bukkit.getWorld("Ages_River"), -906.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock20 = new Location(Bukkit.getWorld("Ages_River"), -907.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock21 = new Location(Bukkit.getWorld("Ages_River"), -908.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock22 = new Location(Bukkit.getWorld("Ages_River"), -909.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock23 = new Location(Bukkit.getWorld("Ages_River"), -910.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock24 = new Location(Bukkit.getWorld("Ages_River"), -911.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock25 = new Location(Bukkit.getWorld("Ages_River"), -912.0, 0.0, -9995.0, 0.0f, 0.0f);
-		this.locationBlock26 = new Location(Bukkit.getWorld("Ages_River"), -913.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock15 = new Location(Bukkit.getWorld("Ages_River"), -902.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock16 = new Location(Bukkit.getWorld("Ages_River"), -903.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock17 = new Location(Bukkit.getWorld("Ages_River"), -904.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock18 = new Location(Bukkit.getWorld("Ages_River"), -905.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock19 = new Location(Bukkit.getWorld("Ages_River"), -906.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock20 = new Location(Bukkit.getWorld("Ages_River"), -907.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock21 = new Location(Bukkit.getWorld("Ages_River"), -908.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock22 = new Location(Bukkit.getWorld("Ages_River"), -909.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock23 = new Location(Bukkit.getWorld("Ages_River"), -910.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock24 = new Location(Bukkit.getWorld("Ages_River"), -911.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock25 = new Location(Bukkit.getWorld("Ages_River"), -912.0, 0.0, -9995.0, 0.0f, 0.0f);
+		locationBlock26 = new Location(Bukkit.getWorld("Ages_River"), -913.0, 0.0, -9995.0, 0.0f, 0.0f);
 
-		this.locationBlock27 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19929.0, 0.0f, 0.0f);
-		this.locationBlock28 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19930.0, 0.0f, 0.0f);
-		this.locationBlock29 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19931.0, 0.0f, 0.0f);
-		this.locationBlock30 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19932.0, 0.0f, 0.0f);
-		this.locationBlock31 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19933.0, 0.0f, 0.0f);
-		this.locationBlock32 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19934.0, 0.0f, 0.0f);
-		this.locationBlock33 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19935.0, 0.0f, 0.0f);
-		this.locationBlock34 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19936.0, 0.0f, 0.0f);
-		this.locationBlock35 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19937.0, 0.0f, 0.0f);
-		this.locationBlock36 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19938.0, 0.0f, 0.0f);
-		this.locationBlock37 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19939.0, 0.0f, 0.0f);
-		this.locationBlock38 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19940.0, 0.0f, 0.0f);
-		this.locationBlock39 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19941.0, 0.0f, 0.0f);
-		this.locationBlock40 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19942.0, 0.0f, 0.0f);
-		this.locationBlock41 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19943.0, 0.0f, 0.0f);
-		this.locationBlock42 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19944.0, 0.0f, 0.0f);
-		this.locationBlock43 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19945.0, 0.0f, 0.0f);
-		this.locationBlock44 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19946.0, 0.0f, 0.0f);
-		this.locationBlock45 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19947.0, 0.0f, 0.0f);
-		this.locationBlock46 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19948.0, 0.0f, 0.0f);
-		this.locationBlock47 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19949.0, 0.0f, 0.0f);
-		this.locationBlock48 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19950.0, 0.0f, 0.0f);
-		this.locationBlock49 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19951.0, 0.0f, 0.0f);
-		this.locationBlock50 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19952.0, 0.0f, 0.0f);
+		locationBlock27 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19929.0, 0.0f, 0.0f);
+		locationBlock28 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19930.0, 0.0f, 0.0f);
+		locationBlock29 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19931.0, 0.0f, 0.0f);
+		locationBlock30 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19932.0, 0.0f, 0.0f);
+		locationBlock31 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19933.0, 0.0f, 0.0f);
+		locationBlock32 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19934.0, 0.0f, 0.0f);
+		locationBlock33 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19935.0, 0.0f, 0.0f);
+		locationBlock34 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19936.0, 0.0f, 0.0f);
+		locationBlock35 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19937.0, 0.0f, 0.0f);
+		locationBlock36 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19938.0, 0.0f, 0.0f);
+		locationBlock37 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19939.0, 0.0f, 0.0f);
+		locationBlock38 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19940.0, 0.0f, 0.0f);
+		locationBlock39 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19941.0, 0.0f, 0.0f);
+		locationBlock40 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19942.0, 0.0f, 0.0f);
+		locationBlock41 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19943.0, 0.0f, 0.0f);
+		locationBlock42 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19944.0, 0.0f, 0.0f);
+		locationBlock44 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19946.0, 0.0f, 0.0f);
+		locationBlock45 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19947.0, 0.0f, 0.0f);
+		locationBlock46 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19948.0, 0.0f, 0.0f);
+		locationBlock47 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19949.0, 0.0f, 0.0f);
+		locationBlock48 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19950.0, 0.0f, 0.0f);
+		locationBlock49 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19951.0, 0.0f, 0.0f);
+		locationBlock50 = new Location(Bukkit.getWorld("Ages_River"), -8832.0, 53.0, -19952.0, 0.0f, 0.0f);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -583,7 +625,7 @@ public class Game implements Listener {
 		}
 	}
 
-	private void giveCompass(Player player) {
+	private static void giveCompass(Player player) {
 		player.getInventory().clear();
 
 		ItemStack compass = new ItemStack(Material.COMPASS, 1);
@@ -598,6 +640,22 @@ public class Game implements Listener {
 
 	}
 
+	private static void giveStick(Player player)
+	{
+		player.getInventory().clear();
+
+		ItemStack stick = new ItemStack(Material.STICK, 1);
+		ItemMeta meta = stick.getItemMeta();
+
+		meta.setDisplayName("§b§lTraining stick");
+		meta.setLore(Arrays.asList("", "§eCe bâton te permet d'aller", "§et'entraîner sur les différentes", "§eépoques"));
+		stick.setItemMeta(meta);
+
+		player.getInventory().setItem(4, stick);
+		player.updateInventory();
+	}
+
+
 	@EventHandler
 	public void onCollision(VehicleEntityCollisionEvent event) {
 		if (event.getEntity() instanceof Boat && event.getVehicle() instanceof Boat) {
@@ -607,7 +665,8 @@ public class Game implements Listener {
 
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent event) {
-		if (event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lBoussole de TP")) {
+		if (event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lBoussole de TP")
+			||event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lTraining stick")) {
 			event.setCancelled(true);
 		}
 	}
@@ -617,11 +676,21 @@ public class Game implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if (event.getItem() == null) return;
 
+			if(AgesRiver.getInstance().getState().getMode() == Mode.GAME)
+			{
+				event.getPlayer().sendMessage(AgesRiver.PREFIX + "§cLa map n'est pas ouverte à l'entraînement pour le moment!");
+			}
+
+			InventoryPlayers invPlayers = new InventoryPlayers();
+
 			if (event.getItem().getItemMeta().getDisplayName().equals("§b§lBoussole de TP")) {
-				InventoryPlayers invPlayers = new InventoryPlayers();
 
 				invPlayers.buildHeads();
 				invPlayers.openInventory(event.getPlayer());
+
+			} else if (event.getItem().getItemMeta().getDisplayName().equals("§b§lTraining stick"))
+			{
+				invPlayers.openTrainingInventory(event.getPlayer());
 			}
 		}
 	}

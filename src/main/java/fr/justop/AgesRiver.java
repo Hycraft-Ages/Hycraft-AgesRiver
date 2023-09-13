@@ -9,10 +9,7 @@ import fr.justop.guis.InventoryPlayers;
 import fr.justop.listeners.Game;
 import fr.justop.listeners.RegisterPlayer;
 import fr.justop.listeners.SavePlayer;
-import fr.justop.players.ListPlayers;
-import fr.justop.players.PlayerStats;
-import fr.justop.players.Profile;
-import fr.justop.players.ProfileManager;
+import fr.justop.players.*;
 import fr.justop.scoreboard.AttenteScoreboard;
 import fr.justop.scoreboard.BossBars;
 import fr.justop.scoreboard.GameScoreboard;
@@ -50,6 +47,8 @@ public final class AgesRiver extends SimplePlugin {
 	private final Map<UUID, Integer> finished = new HashMap<>();
 	private BossBars bossBars;
 
+	private Trainer trainer;
+
 	/**
 	 * Automatically perform login ONCE when the plugin starts.
 	 */
@@ -82,6 +81,7 @@ public final class AgesRiver extends SimplePlugin {
 		this.gameScoreboard = new GameScoreboard(this);
 		this.configuration = new SpawnManager(this);
 		this.list = new ListPlayers();
+		this.trainer = new Trainer();
 
 		onCommands();
 		onListeners();
@@ -190,4 +190,7 @@ public final class AgesRiver extends SimplePlugin {
 		return (AgesRiver) SimplePlugin.getInstance();
 	}
 
+	public Trainer getTrainer() {
+		return trainer;
+	}
 }

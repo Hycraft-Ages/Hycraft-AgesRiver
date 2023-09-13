@@ -1,6 +1,7 @@
 package fr.justop.commands;
 
 import fr.justop.AgesRiver;
+import fr.justop.enums.Mode;
 import fr.justop.enums.StateGame;
 import fr.justop.enums.StateManager;
 import fr.justop.listeners.Game;
@@ -148,6 +149,8 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter {
 							Bukkit.getServer().getConsoleSender().sendMessage(AgesRiver.PREFIX + "§2" + player.getName() + " §aa relaod le plugin");
 							return true;
 						}
+
+
 						break;
 
 					case 2:
@@ -177,6 +180,61 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter {
 							}
 						}
 
+						if (args[0].equalsIgnoreCase("switchMode"))
+						{
+							if(AgesRiver.getInstance().getState().getStatistique() != StateGame.ATTENTE)
+							{
+								player.sendMessage(AgesRiver.PREFIX + "§cVous ne pouvez pas executer cette action si une partie est lancée ou en cours de lancement!");
+								return false;
+							}
+
+							switch(args[1])
+							{
+								case "training":
+
+									if(AgesRiver.getInstance().getState().getMode() == Mode.TRAINING)
+									{
+										player.sendMessage(AgesRiver.PREFIX + "§cRien n'a changé!");
+										return false;
+									}
+
+									AgesRiver.getInstance().getState().setMode(Mode.TRAINING);
+									AgesRiver.getInstance().getList().getPlayers().clear();
+
+									Bukkit.broadcastMessage(AgesRiver.PREFIX + "§eLe mode est desormais défini sur entraînement. §c<0/16>");
+
+									for(Player playerFromList : Bukkit.getOnlinePlayers())
+									{
+										AgesRiver.getInstance().getAttenteScoreboard().addToScoreBoard(playerFromList);
+									}
+
+									break;
+
+								case "game":
+
+									if(AgesRiver.getInstance().getState().getMode() == Mode.GAME)
+									{
+										player.sendMessage(AgesRiver.PREFIX + "§cRien n'a changé!");
+										return false;
+									}
+
+									AgesRiver.getInstance().getState().setMode(Mode.GAME);
+									Bukkit.broadcastMessage(AgesRiver.PREFIX + "§eLe mode est desormais défini sur jeu.");
+
+									for(Player playerFromList : Bukkit.getOnlinePlayers())
+									{
+										if(!playerFromList.hasPermission("hycraft.boatrace.staff"))
+										{
+											Game.joinPlayer(playerFromList);
+										}
+
+									}
+
+
+									break;
+							}
+						}
+
 				}
 				return true;
 			}
@@ -190,7 +248,7 @@ public class CommandBoatStaff implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
 		ArrayList<String> result = new ArrayList<>();
-		String[] VALUES = {"force-start", "leave", "join", "reload", "profile", "state"};
+		String[] VALUES = {"force-start", "leave", "join", "reload", "profile", "state", "switchMode"};
 
 		if (command.getName().equalsIgnoreCase("boat-staff")) {
 			switch (args.length) {

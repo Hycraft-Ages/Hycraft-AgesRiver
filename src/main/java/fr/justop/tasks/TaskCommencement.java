@@ -56,7 +56,6 @@ public class TaskCommencement extends BukkitRunnable
 			{
 				AgesRiver.getInstance().getStats().getNbTour().put(player.getUniqueId(), 1);
 				Remain.sendBossbarPercent(player, "§a§lPréhistoire",100, CompBarColor.GREEN, CompBarStyle.SOLID);
-				AgesRiver.getInstance().getGameScoreboard().addToScoreBoard(player);
 				AgesRiver.getInstance().getStats().getCurrentAge().put(player.getUniqueId(), 1);
 			}
 
