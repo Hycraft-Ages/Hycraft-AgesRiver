@@ -94,7 +94,7 @@ public class InventoryPlayers implements Listener
 		fmeta.setLore(null);
 		filler.setItemMeta(fmeta);
 
-		for(int slot = 0; slot < 18; slot++)
+		for(int slot = 0; slot < 27; slot++)
 		{
 			inventory.setItem(slot, filler);
 		}

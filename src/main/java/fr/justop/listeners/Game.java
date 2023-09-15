@@ -702,7 +702,8 @@ public class Game implements Listener {
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent event) {
 		if (event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lBoussole de TP")
-			||event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lTraining stick")) {
+			||event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§b§lTraining stick")
+			||event.getItemDrop().getItemStack().getItemMeta().getDisplayName().equals("§6§lRevenir au spawn")) {
 			event.setCancelled(true);
 		}
 	}
@@ -711,11 +712,6 @@ public class Game implements Listener {
 	public void onInteract(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if (event.getItem() == null) return;
-
-			if(AgesRiver.getInstance().getState().getMode() == Mode.GAME)
-			{
-				event.getPlayer().sendMessage(AgesRiver.PREFIX + "§cLa map n'est pas ouverte à l'entraînement pour le moment!");
-			}
 
 			InventoryPlayers invPlayers = new InventoryPlayers();
 
@@ -726,6 +722,12 @@ public class Game implements Listener {
 
 			} else if (event.getItem().getItemMeta().getDisplayName().equals("§b§lTraining compass"))
 			{
+				if(AgesRiver.getInstance().getState().getMode() == Mode.GAME)
+				{
+					event.getPlayer().sendMessage(AgesRiver.PREFIX + "§cLa map n'est pas ouverte à l'entraînement pour le moment!");
+					return;
+				}
+
 				invPlayers.openTrainingInventory(event.getPlayer());
 			}
 		}
@@ -846,8 +848,8 @@ public class Game implements Listener {
 						FireworkMeta fireworkMeta = firework.getFireworkMeta();
 
 						FireworkEffect effect = FireworkEffect.builder()
-								.withColor((Iterable<?>) Color.RED)
-								.withFade((Iterable<?>) Color.YELLOW)
+								.withColor(org.bukkit.Color.RED)
+								.withFade(org.bukkit.Color.YELLOW)
 								.with(FireworkEffect.Type.BALL)
 								.trail(true)
 								.build();
@@ -886,7 +888,7 @@ public class Game implements Listener {
 
 				}
 
-			}.runTaskTimer(AgesRiver.getInstance(), 20L, 0L);
+			}.runTaskTimer(AgesRiver.getInstance(), 0L, 20L);
 
 			for(Player player : file)
 			{
