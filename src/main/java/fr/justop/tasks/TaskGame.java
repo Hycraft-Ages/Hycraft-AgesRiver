@@ -38,9 +38,9 @@ public class TaskGame extends BukkitRunnable {
 		int secs = remainder;
 
 		if (secs < 10) {
-			return minutes + "'0" + secs + "";
+			return minutes + "'0" + secs;
 		}
 
-		return minutes + "'" + secs + "";
+		return minutes + "'" + secs;
 	}
 }

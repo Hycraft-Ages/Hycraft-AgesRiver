@@ -20,7 +20,7 @@ public class InventoryPlayers implements Listener
 {
 	private Inventory inventaire = Bukkit.createInventory(null, 18, "Menu de Téléportation");
 
-	private Inventory inventory = Bukkit.createInventory(null, 18, "Menu d'entraînement");
+	private Inventory inventory = Bukkit.createInventory(null, 27, "Menu d'entraînement");
 	private List<ItemStack> heads = new ArrayList<>();
 	private ItemStack FILLER;
 	private int count = 0;

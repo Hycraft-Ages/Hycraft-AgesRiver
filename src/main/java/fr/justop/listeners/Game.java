@@ -8,6 +8,7 @@ import fr.justop.guis.InventoryPlayers;
 import fr.justop.holograms.HologramManager;
 import fr.justop.players.ListPlayers;
 import fr.justop.players.PlayerStats;
+import fr.justop.players.Trainer;
 import fr.justop.tasks.TaskCommencement;
 import fr.justop.tasks.TaskGame;
 import fr.justop.worlds.Worlds;
@@ -169,8 +170,8 @@ public class Game implements Listener {
 		player.sendMessage("                      §eserveur !                  ");
 		player.sendMessage("    §eTu a rejoint le jeu en mode entraînement. ");
 		player.sendMessage("      §ePour t'entraîner dans les différentes       ");
-		player.sendMessage("                §eépoques, utilise le           ");
-		player.sendMessage("                §a§lTraining stick");
+		player.sendMessage("                §eépoques, utilise la           ");
+		player.sendMessage("                §a§lTraining compass");
 		player.sendMessage("");
 		player.sendMessage("                 §6§lBonne séance!            ");
 		player.sendMessage("§8§m----------------------------------------");
@@ -287,7 +288,7 @@ public class Game implements Listener {
 
 		}
 		if (this.instance.getState().getStatistique() == StateGame.JEU) {
-			player.getVehicle().remove();
+			Objects.requireNonNull(player.getVehicle()).remove();
 			event.setQuitMessage(AgesRiver.PREFIX + "§e " + player.getName() + "§c a quitté la partie !");
 		}
 	}
@@ -295,7 +296,7 @@ public class Game implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onExitBoat(VehicleExitEvent event) {
-		if (event.getVehicle().getPassenger().isOp() && AgesRiver.getInstance().getState().getStatistique() != StateGame.JEU) {
+		if (event.getExited().hasPermission("hycraft.boatrace.staff") && AgesRiver.getInstance().getState().getStatistique() != StateGame.JEU) {
 			return;
 		}
 
@@ -384,8 +385,9 @@ public class Game implements Listener {
 		if (event.getVehicle() instanceof Boat) {
 			Boat boat = (Boat) event.getVehicle();
 
-			if (boat.isEmpty()) {
-				Bukkit.getConsoleSender().sendMessage("Null");
+			if (boat.isEmpty())
+			{
+				boat.remove();
 				return;
 			}
 
@@ -395,7 +397,10 @@ public class Game implements Listener {
 				Bukkit.getConsoleSender().sendMessage("Null Player");
 			}
 
-			this.playerStats = AgesRiver.getInstance().getStats();
+			if(AgesRiver.getInstance().getState().getMode() == Mode.GAME)
+			{
+				playerStats = AgesRiver.getInstance().getStats();
+			}
 
 			Location locationTo = event.getTo().getBlock().getLocation();
 
@@ -414,37 +419,47 @@ public class Game implements Listener {
 					locationTo.equals(locationBlock13) ||
 					locationTo.equals(locationBlock14)) {
 
-				AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -888.0, 55.0, -9515.0, 180.0f, 0.0f));
-				player.sendMessage(AgesRiver.PREFIX + "§aVous entrez en Antiquité!");
+				player.playSound(player, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.0f, 1.0f);
 				boat.remove();
 
-				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.0f, 1.0f);
+				if(AgesRiver.getInstance().getState().getMode() == Mode.TRAINING)
+				{
+					AgesRiver.getInstance().getTrainer().joinAge(player, "prehistoire");
+					player.sendMessage(AgesRiver.PREFIX + "§aVous avez effectué un temps de : §e" + TaskGame.secondsToMinutes(AgesRiver.getInstance().getTrainer().getTimeMap().get(player.getUniqueId()).getA()));
+					AgesRiver.getInstance().getTrainer().getTimeMap().get(player.getUniqueId()).getB().cancel();
+					AgesRiver.getInstance().getTrainer().getTimeMap().remove(player.getUniqueId());
+					return;
+				}
+
+				AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -888.0, 55.0, -9515.0, 180.0f, 0.0f));
+				player.sendMessage(AgesRiver.PREFIX + "§aVous entrez en Antiquité!");
+
 				Remain.removeBossbar(player);
 				Remain.sendBossbarPercent(player, "§e§lAntiquité", 100, CompBarColor.YELLOW, CompBarStyle.SOLID);
-				int current = this.playerStats.getNbTour().get(player.getUniqueId());
+				int current = playerStats.getNbTour().get(player.getUniqueId());
 
 				switch (current) {
 					case 1:
-						this.playerStats.getSeg1().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer());
+						playerStats.getSeg1().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer());
 						this.instance.getStats().getCurrentAge().put(player.getUniqueId(), 2);
 						break;
 
 					case 2:
-						this.playerStats.getSeg4().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer()
-								- this.playerStats.getSeg1().get(player.getUniqueId())
-								- this.playerStats.getSeg2().get(player.getUniqueId())
-								- this.playerStats.getSeg3().get(player.getUniqueId()));
+						playerStats.getSeg4().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer()
+								- playerStats.getSeg1().get(player.getUniqueId())
+								- playerStats.getSeg2().get(player.getUniqueId())
+								- playerStats.getSeg3().get(player.getUniqueId()));
 						this.instance.getStats().getCurrentAge().put(player.getUniqueId(), 2);
 						break;
 
 					case 3:
-						this.playerStats.getSeg7().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer()
-								- this.playerStats.getSeg1().get(player.getUniqueId())
-								- this.playerStats.getSeg2().get(player.getUniqueId())
-								- this.playerStats.getSeg3().get(player.getUniqueId())
-								- this.playerStats.getSeg4().get(player.getUniqueId())
-								- this.playerStats.getSeg5().get(player.getUniqueId())
-								- this.playerStats.getSeg6().get(player.getUniqueId()));
+						playerStats.getSeg7().put(player.getUniqueId(), AgesRiver.getInstance().getTaskGame().getTimer()
+								- playerStats.getSeg1().get(player.getUniqueId())
+								- playerStats.getSeg2().get(player.getUniqueId())
+								- playerStats.getSeg3().get(player.getUniqueId())
+								- playerStats.getSeg4().get(player.getUniqueId())
+								- playerStats.getSeg5().get(player.getUniqueId())
+								- playerStats.getSeg6().get(player.getUniqueId()));
 						this.instance.getStats().getCurrentAge().put(player.getUniqueId(), 2);
 						break;
 				}
@@ -464,12 +479,23 @@ public class Game implements Listener {
 					locationTo.equals(locationBlock23) ||
 					locationTo.equals(locationBlock24) ||
 					locationTo.equals(locationBlock25) ||
-					locationTo.equals(locationBlock26)) {
-				AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -8940.0, 82.0, -19893.0, 60.0f, 0.0f));
-				player.sendMessage(AgesRiver.PREFIX + "§aVous entrez au Moyen-Age!");
+					locationTo.equals(locationBlock26))
+			{
+				player.playSound(player, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.0f, 1.0f);
 				boat.remove();
 
-				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.0f, 1.0f);
+				if(AgesRiver.getInstance().getState().getMode() == Mode.TRAINING)
+				{
+					AgesRiver.getInstance().getTrainer().joinAge(player, "antiquite");
+					player.sendMessage(AgesRiver.PREFIX + "§aVous avez effectué un temps de : §e" + TaskGame.secondsToMinutes(AgesRiver.getInstance().getTrainer().getTimeMap().get(player.getUniqueId()).getA()));
+					AgesRiver.getInstance().getTrainer().getTimeMap().get(player.getUniqueId()).getB().cancel();
+					AgesRiver.getInstance().getTrainer().getTimeMap().remove(player.getUniqueId());
+					return;
+				}
+
+				AgesRiver.getInstance().getList().setPlayerPassenger(player, new Location(Bukkit.getWorld("Ages_River"), -8940.0, 82.0, -19893.0, 60.0f, 0.0f));
+				player.sendMessage(AgesRiver.PREFIX + "§aVous entrez au Moyen-âge!");
+
 				Remain.removeBossbar(player);
 				Remain.sendBossbarPercent(player, "§b§lMoyen-âge", 100, CompBarColor.BLUE, CompBarStyle.SOLID);
 				int current = this.playerStats.getNbTour().get(player.getUniqueId());
@@ -530,6 +556,17 @@ public class Game implements Listener {
 					locationTo.equals(locationBlock49) ||
 					locationTo.equals(locationBlock50))
 			{
+				if(AgesRiver.getInstance().getState().getMode() == Mode.TRAINING)
+				{
+					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 1.0f, 1.0f);
+					AgesRiver.getInstance().getTrainer().joinAge(player, "antiquite");
+					boat.remove();
+					player.sendMessage(AgesRiver.PREFIX + "§aVous avez effectué un temps de : §e" + TaskGame.secondsToMinutes(AgesRiver.getInstance().getTrainer().getTimeMap().get(player.getUniqueId()).getA()));
+					AgesRiver.getInstance().getTrainer().getTimeMap().get(player.getUniqueId()).getB().cancel();
+					AgesRiver.getInstance().getTrainer().getTimeMap().remove(player.getUniqueId());
+					return;
+				}
+
 				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
 				boat.remove();
 
@@ -643,11 +680,11 @@ public class Game implements Listener {
 	{
 		player.getInventory().clear();
 
-		ItemStack stick = new ItemStack(Material.STICK, 1);
+		ItemStack stick = new ItemStack(Material.RECOVERY_COMPASS, 1);
 		ItemMeta meta = stick.getItemMeta();
 
-		meta.setDisplayName("§b§lTraining stick");
-		meta.setLore(Arrays.asList("", "§eCe bâton te permet d'aller", "§et'entraîner sur les différentes", "§eépoques"));
+		meta.setDisplayName("§b§lTraining compass");
+		meta.setLore(Arrays.asList("", "§eCette boussole te permet d'aller", "§et'entraîner sur les différentes", "§eépoques"));
 		stick.setItemMeta(meta);
 
 		player.getInventory().setItem(4, stick);
@@ -687,7 +724,7 @@ public class Game implements Listener {
 				invPlayers.buildHeads();
 				invPlayers.openInventory(event.getPlayer());
 
-			} else if (event.getItem().getItemMeta().getDisplayName().equals("§b§lTraining stick"))
+			} else if (event.getItem().getItemMeta().getDisplayName().equals("§b§lTraining compass"))
 			{
 				invPlayers.openTrainingInventory(event.getPlayer());
 			}

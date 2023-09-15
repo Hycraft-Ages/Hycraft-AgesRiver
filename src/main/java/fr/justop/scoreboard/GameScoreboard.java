@@ -58,8 +58,9 @@ public class GameScoreboard
 		String p2 = (s2 == null) ? "?" : s2;
 		String p3 = (s3 == null) ? "?" : s3;
 
-		obj.getScore("   ").setScore(10);
-		obj.getScore("Pseudo: §a" + player.getName()).setScore(9);
+		obj.getScore("   ").setScore(11);
+		obj.getScore("Pseudo: §a" + player.getName()).setScore(10);
+		obj.getScore("                       ").setScore(9);
 		obj.getScore("Temps écoulé: §e" + AgesRiver.getInstance().getTaskGame().toString()).setScore(8);
 		obj.getScore("  ").setScore(7);
 		obj.getScore("§9§l+---------------§r§9§l+§4").setScore(6);
